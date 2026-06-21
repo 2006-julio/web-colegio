@@ -1,40 +1,41 @@
 ---
-const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+const base = import.meta.env.BASE_URL;
 const currentPath = Astro.url.pathname;
 
-const cleanPath =
-  base && currentPath.startsWith(base)
-    ? currentPath.slice(base.length) || "/"
-    : currentPath;
-
 const links = [
-  { path: "/", label: "Inicio" },
-  { path: "/nosotros", label: "Nosotros" },
-  { path: "/noticias", label: "Noticias y comunicados" },
-  { path: "/galeria", label: "Galería" },
-  { path: "/contacto", label: "Contacto" },
-  { path: "/matricula", label: "Matrícula" },
+  { href: base, label: "Inicio" },
+  { href: `${base}nosotros/`, label: "Nosotros" },
+  { href: `${base}noticias/`, label: "Noticias y comunicados" },
+  { href: `${base}galeria/`, label: "Galería" },
+  { href: `${base}contacto/`, label: "Contacto" },
+  { href: `${base}matricula/`, label: "Matrícula" },
 ];
 
-const getHref = (path: string) => {
-  return `${base}${path === "/" ? "/" : path}`;
+const loginHref = `${base}login/`;
+const logoSrc = `${base}img/insigniaxammar.jpg`;
+
+const normalizePath = (path: string) => {
+  return path.endsWith("/") ? path : `${path}/`;
 };
 
-const isActive = (path: string) => {
-  if (path === "/") {
-    return cleanPath === "/" || cleanPath === "";
+const isActive = (href: string) => {
+  const current = normalizePath(currentPath);
+  const target = normalizePath(href);
+
+  if (target === normalizePath(base)) {
+    return current === normalizePath(base);
   }
 
-  return cleanPath.startsWith(path);
+  return current.startsWith(target);
 };
 ---
 
 <header class="fixed top-0 left-0 w-full z-50 bg-[#0B2344]/90 backdrop-blur border-b border-white/10">
   <nav class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-    <a href={getHref("/")} class="flex items-center gap-3">
+    <a href={base} class="flex items-center gap-3">
       <div class="w-12 h-12 rounded-full bg-white p-1 flex items-center justify-center overflow-hidden">
         <img
-          src={`${base}/img/insigniaxammar.jpg`}
+          src={logoSrc}
           alt="Insignia I.E. Luis Fabio Xammar"
           class="w-full h-full object-contain"
         />
@@ -50,9 +51,9 @@ const isActive = (path: string) => {
       {
         links.map((link) => (
           <a
-            href={getHref(link.path)}
+            href={link.href}
             class={`transition ${
-              isActive(link.path)
+              isActive(link.href)
                 ? "text-[#60B5E8] font-semibold"
                 : "text-slate-300 hover:text-white"
             }`}
@@ -64,9 +65,9 @@ const isActive = (path: string) => {
     </div>
 
     <a
-      href={getHref("/login")}
+      href={loginHref}
       class={`hidden md:inline-block px-4 py-2 rounded-xl text-sm font-semibold transition ${
-        isActive("/login")
+        isActive(loginHref)
           ? "bg-[#60B5E8] text-[#0B2344]"
           : "bg-[#2F8FC9] hover:bg-[#60B5E8] text-white hover:text-[#0B2344]"
       }`}
@@ -91,9 +92,9 @@ const isActive = (path: string) => {
       {
         links.map((link) => (
           <a
-            href={getHref(link.path)}
+            href={link.href}
             class={`transition ${
-              isActive(link.path)
+              isActive(link.href)
                 ? "text-[#60B5E8] font-semibold"
                 : "text-slate-300 hover:text-white"
             }`}
@@ -104,9 +105,9 @@ const isActive = (path: string) => {
       }
 
       <a
-        href={getHref("/login")}
+        href={loginHref}
         class={`px-4 py-3 rounded-xl text-sm font-semibold text-center transition ${
-          isActive("/login")
+          isActive(loginHref)
             ? "bg-[#60B5E8] text-[#0B2344]"
             : "bg-[#2F8FC9] hover:bg-[#60B5E8] text-white hover:text-[#0B2344]"
         }`}
