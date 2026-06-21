@@ -1,0 +1,149 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Navbar from "../components/Navbar.astro";
+---
+
+<Layout title="Panel Admin | I.E. Luis Fabio Xammar">
+  <Navbar />
+
+  <main class="min-h-screen pt-32 px-6 bg-gradient-to-br from-[#0B2344] via-[#123C73] to-[#0B2344]">
+    <section class="max-w-6xl mx-auto">
+      <div id="cargando" class="text-center text-slate-300">
+        Verificando sesión...
+      </div>
+
+      <div id="contenido-admin" class="hidden">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-10">
+          <div>
+            <p class="text-[#60B5E8] font-semibold mb-2">
+              Panel administrativo
+            </p>
+
+            <h1 class="text-4xl md:text-5xl font-bold">
+              Bienvenido administrador
+            </h1>
+
+            <p id="correo-admin" class="text-slate-300 mt-3"></p>
+          </div>
+
+          <button
+            id="btn-logout"
+            class="bg-white text-[#0B2344] hover:bg-slate-200 px-5 py-3 rounded-xl font-semibold transition"
+          >
+            Cerrar sesión
+          </button>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-6">
+          <a
+            href="/admin-noticias"
+            class="group bg-white/10 border border-white/10 rounded-3xl p-6 hover:bg-white/15 transition"
+          >
+            <div class="w-14 h-14 rounded-2xl bg-[#2F8FC9] flex items-center justify-center text-2xl mb-5">
+              📰
+            </div>
+
+            <h2 class="text-2xl font-bold mb-3 group-hover:text-[#60B5E8] transition">
+              Noticias
+            </h2>
+
+            <p class="text-slate-300">
+              Crear, editar y eliminar noticias institucionales del colegio.
+            </p>
+          </a>
+
+          <a
+            href="/admin-galeria"
+            class="group bg-white/10 border border-white/10 rounded-3xl p-6 hover:bg-white/15 transition"
+          >
+            <div class="w-14 h-14 rounded-2xl bg-[#2F8FC9] flex items-center justify-center text-2xl mb-5">
+              🖼️
+            </div>
+
+            <h2 class="text-2xl font-bold mb-3 group-hover:text-[#60B5E8] transition">
+              Galería
+            </h2>
+
+            <p class="text-slate-300">
+              Administrar imágenes de actividades, eventos y momentos institucionales.
+            </p>
+          </a>
+
+          <a
+            href="/noticias"
+            class="group bg-white/10 border border-white/10 rounded-3xl p-6 hover:bg-white/15 transition"
+            >
+            <div class="w-14 h-14 rounded-2xl bg-[#2F8FC9] flex items-center justify-center text-2xl mb-5">
+                👁️
+            </div>
+
+            <h2 class="text-2xl font-bold mb-3 group-hover:text-[#60B5E8] transition">
+                Ver publicaciones
+            </h2>
+
+            <p class="text-slate-300">
+                Revisar cómo se muestran las noticias, comunicados, avisos y eventos en la página pública.
+            </p>
+            </a>
+            <a
+              href="/admin-mensajes"
+              class="group bg-white/10 border border-white/10 rounded-3xl p-6 hover:bg-white/15 transition"
+            >
+              <div class="w-14 h-14 rounded-2xl bg-[#2F8FC9] flex items-center justify-center text-2xl mb-5">
+                ✉️
+              </div>
+
+              <h2 class="text-2xl font-bold mb-3 group-hover:text-[#60B5E8] transition">
+                Mensajes
+              </h2>
+
+              <p class="text-slate-300">
+                Revisar mensajes enviados desde el formulario de contacto.
+              </p>
+            </a>
+        </div>
+      </div>
+    </section>
+  </main>
+</Layout>
+
+<script>
+  import { onAuthStateChanged, signOut } from "firebase/auth";
+  import { auth } from "../firebase/config.js";
+
+  const cargando = document.getElementById("cargando");
+  const contenidoAdmin = document.getElementById("contenido-admin");
+  const correoAdmin = document.getElementById("correo-admin");
+  const btnLogout = document.getElementById("btn-logout");
+
+  onAuthStateChanged(auth, (user) => {
+    if (!user) {
+      window.location.href = "/login";
+      return;
+    }
+
+    if (cargando instanceof HTMLDivElement) {
+      cargando.classList.add("hidden");
+    }
+
+    if (contenidoAdmin instanceof HTMLDivElement) {
+      contenidoAdmin.classList.remove("hidden");
+    }
+
+    if (correoAdmin instanceof HTMLParagraphElement) {
+      correoAdmin.textContent = `Sesión iniciada como: ${user.email}`;
+    }
+  });
+
+  if (btnLogout instanceof HTMLButtonElement) {
+    btnLogout.addEventListener("click", async () => {
+      try {
+        await signOut(auth);
+        window.location.href = "/login";
+      } catch (error) {
+        console.error(error);
+        alert("No se pudo cerrar sesión.");
+      }
+    });
+  }
+</script>

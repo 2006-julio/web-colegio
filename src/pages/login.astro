@@ -1,0 +1,110 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Navbar from "../components/Navbar.astro";
+---
+
+<Layout title="Login | I.E. Luis Fabio Xammar">
+  <Navbar />
+
+  <main class="min-h-screen flex items-center justify-center px-6 pt-24 bg-gradient-to-br from-[#0B2344] via-[#123C73] to-[#0B2344]">
+    <section class="w-full max-w-md bg-white/10 border border-white/10 rounded-3xl p-8 shadow-2xl">
+      <div class="flex justify-center mb-6">
+        <img
+          src="/img/insigniaxammar.jpg"
+          alt="Insignia I.E. Luis Fabio Xammar"
+          class="w-20 h-20 rounded-full object-cover bg-white p-2"
+        />
+      </div>
+
+      <h1 class="text-3xl font-bold mb-2 text-center">
+        Iniciar sesión
+      </h1>
+
+      <p class="text-slate-300 text-center mb-8">
+        Acceso para administradores de la institución
+      </p>
+
+      <form id="form-login" class="space-y-4">
+        <input
+          id="email"
+          type="email"
+          placeholder="Correo electrónico"
+          class="w-full px-4 py-3 rounded-xl bg-[#0B2344] border border-white/10 outline-none focus:border-[#60B5E8]"
+          required
+        />
+
+        <input
+          id="password"
+          type="password"
+          placeholder="Contraseña"
+          class="w-full px-4 py-3 rounded-xl bg-[#0B2344] border border-white/10 outline-none focus:border-[#60B5E8]"
+          required
+        />
+
+        <button
+          id="btn-login"
+          type="submit"
+          class="w-full bg-[#2F8FC9] hover:bg-[#60B5E8] text-white hover:text-[#0B2344] px-6 py-3 rounded-xl font-semibold transition disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+          Ingresar
+        </button>
+
+        <p id="mensaje-login" class="text-center text-sm mt-4"></p>
+      </form>
+    </section>
+  </main>
+</Layout>
+
+<script>
+  import { signInWithEmailAndPassword } from "firebase/auth";
+  import { auth } from "../firebase/config";
+
+  const formLogin = document.getElementById("form-login");
+  const emailInput = document.getElementById("email");
+  const passwordInput = document.getElementById("password");
+  const mensajeLogin = document.getElementById("mensaje-login");
+  const btnLogin = document.getElementById("btn-login");
+
+  if (
+    formLogin instanceof HTMLFormElement &&
+    emailInput instanceof HTMLInputElement &&
+    passwordInput instanceof HTMLInputElement &&
+    mensajeLogin instanceof HTMLParagraphElement &&
+    btnLogin instanceof HTMLButtonElement
+  ) {
+    formLogin.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const email = emailInput.value.trim();
+      const password = passwordInput.value.trim();
+
+      if (!email || !password) {
+        mensajeLogin.textContent = "Completa el correo y la contraseña.";
+        mensajeLogin.className = "text-center text-sm mt-4 text-yellow-300";
+        return;
+      }
+
+      mensajeLogin.textContent = "Ingresando...";
+      mensajeLogin.className = "text-center text-sm mt-4 text-slate-300";
+      btnLogin.disabled = true;
+      btnLogin.textContent = "Validando...";
+
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+
+        mensajeLogin.textContent = "Inicio de sesión correcto.";
+        mensajeLogin.className = "text-center text-sm mt-4 text-green-300";
+
+        window.location.href = "/admin";
+      } catch (error) {
+        console.error(error);
+
+        mensajeLogin.textContent = "Correo o contraseña incorrectos.";
+        mensajeLogin.className = "text-center text-sm mt-4 text-red-300";
+      } finally {
+        btnLogin.disabled = false;
+        btnLogin.textContent = "Ingresar";
+      }
+    });
+  }
+</script>

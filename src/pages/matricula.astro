@@ -1,0 +1,303 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Navbar from "../components/Navbar.astro";
+import Footer from "../components/Footer.astro";
+---
+
+<Layout title="Matrícula | I.E. Luis Fabio Xammar">
+  <Navbar />
+
+  <main class="min-h-screen pt-32 bg-gradient-to-br from-[#0B2344] via-[#123C73] to-[#0B2344]">
+    <!-- ENCABEZADO -->
+    <section class="px-6 pb-20">
+      <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+        <div>
+          <p class="text-[#60B5E8] font-semibold mb-4">
+            Proceso de matrícula
+          </p>
+
+          <h1 class="text-4xl md:text-6xl font-bold leading-tight mb-6">
+            Información para matrícula escolar
+          </h1>
+
+          <p class="text-slate-200 text-lg leading-relaxed mb-8">
+            En esta sección encontrarás información sobre requisitos,
+            documentos necesarios y pasos generales para el proceso de matrícula
+            en la I.E. Luis Fabio Xammar.
+          </p>
+
+          <div class="flex flex-col sm:flex-row gap-4">
+            <a
+              href="/contacto"
+              class="bg-[#2F8FC9] hover:bg-[#60B5E8] text-white hover:text-[#0B2344] px-6 py-3 rounded-xl font-semibold transition text-center"
+            >
+              Consultar matrícula
+            </a>
+
+            <a
+              href="/noticias"
+              class="border border-white/30 hover:bg-white/10 px-6 py-3 rounded-xl font-semibold transition text-center"
+            >
+              Ver comunicados
+            </a>
+          </div>
+        </div>
+
+        <div class="relative bg-white/10 border border-white/10 rounded-3xl p-6 shadow-2xl overflow-hidden">
+          <div class="absolute -top-20 -right-20 w-52 h-52 bg-[#60B5E8]/30 rounded-full blur-3xl"></div>
+          <div class="absolute -bottom-20 -left-20 w-52 h-52 bg-white/20 rounded-full blur-3xl"></div>
+
+          <div class="relative bg-white rounded-2xl p-8 text-center text-[#0B2344]">
+            <div class="w-24 h-24 mx-auto rounded-2xl bg-[#2F8FC9] flex items-center justify-center text-4xl mb-6">
+              📝
+            </div>
+
+            <h2 class="text-2xl md:text-3xl font-extrabold mb-3">
+              Matrícula 2026
+            </h2>
+
+            <p class="text-slate-600">
+              Revisa los requisitos y mantente atento a los comunicados
+              oficiales publicados por la institución.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PASOS -->
+    <section class="px-6 py-20 bg-[#0B2344]">
+      <div class="max-w-6xl mx-auto">
+        <div class="text-center mb-12">
+          <p class="text-[#60B5E8] font-semibold mb-3">
+            Guía general
+          </p>
+
+          <h2 class="text-3xl md:text-4xl font-bold">
+            Pasos para el proceso de matrícula
+          </h2>
+
+          <p class="text-slate-300 mt-4 max-w-3xl mx-auto">
+            Estos pasos sirven como orientación general. Las fechas y
+            procedimientos oficiales deben confirmarse mediante comunicados de
+            la institución.
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-4 gap-6">
+          <div class="bg-white/10 border border-white/10 rounded-3xl p-6">
+            <p class="text-4xl font-extrabold text-[#60B5E8] mb-4">01</p>
+            <h3 class="text-xl font-bold mb-3">Revisar comunicado</h3>
+            <p class="text-slate-300 text-sm">
+              Verifica las fechas, horarios y requisitos publicados por la
+              institución.
+            </p>
+          </div>
+
+          <div class="bg-white/10 border border-white/10 rounded-3xl p-6">
+            <p class="text-4xl font-extrabold text-[#60B5E8] mb-4">02</p>
+            <h3 class="text-xl font-bold mb-3">Preparar documentos</h3>
+            <p class="text-slate-300 text-sm">
+              Reúne los documentos del estudiante y del apoderado según los
+              requisitos solicitados.
+            </p>
+          </div>
+
+          <div class="bg-white/10 border border-white/10 rounded-3xl p-6">
+            <p class="text-4xl font-extrabold text-[#60B5E8] mb-4">03</p>
+            <h3 class="text-xl font-bold mb-3">Presentar solicitud</h3>
+            <p class="text-slate-300 text-sm">
+              Realiza el trámite correspondiente siguiendo las indicaciones de
+              la institución.
+            </p>
+          </div>
+
+          <div class="bg-white/10 border border-white/10 rounded-3xl p-6">
+            <p class="text-4xl font-extrabold text-[#60B5E8] mb-4">04</p>
+            <h3 class="text-xl font-bold mb-3">Confirmar matrícula</h3>
+            <p class="text-slate-300 text-sm">
+              Espera la confirmación final y conserva la constancia o
+              documentación entregada.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- REQUISITOS -->
+    <section class="px-6 py-20 bg-gradient-to-br from-[#123C73] to-[#0B2344]">
+      <div class="max-w-6xl mx-auto grid lg:grid-cols-2 gap-8">
+        <div class="bg-white/10 border border-white/10 rounded-3xl p-8">
+          <p class="text-[#60B5E8] font-semibold mb-3">
+            Documentos requeridos
+          </p>
+
+          <h2 class="text-3xl font-bold mb-6">
+            Requisitos generales
+          </h2>
+
+          <ul class="space-y-4 text-slate-200">
+            <li class="flex gap-3">
+              <span class="text-[#60B5E8] font-bold">✓</span>
+              <span>Copia de DNI del estudiante.</span>
+            </li>
+
+            <li class="flex gap-3">
+              <span class="text-[#60B5E8] font-bold">✓</span>
+              <span>Copia de DNI del padre, madre o apoderado.</span>
+            </li>
+
+            <li class="flex gap-3">
+              <span class="text-[#60B5E8] font-bold">✓</span>
+              <span>Ficha de matrícula completa.</span>
+            </li>
+
+            <li class="flex gap-3">
+              <span class="text-[#60B5E8] font-bold">✓</span>
+              <span>Constancia de estudios o certificado, si corresponde.</span>
+            </li>
+
+            <li class="flex gap-3">
+              <span class="text-[#60B5E8] font-bold">✓</span>
+              <span>Libreta de notas o reporte académico anterior.</span>
+            </li>
+
+            <li class="flex gap-3">
+              <span class="text-[#60B5E8] font-bold">✓</span>
+              <span>Otros documentos solicitados por la institución.</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="bg-white rounded-3xl p-8 text-[#0B2344]">
+          <p class="font-semibold text-[#2F8FC9] mb-3">
+            Aviso importante
+          </p>
+
+          <h2 class="text-3xl font-extrabold mb-6">
+            Información sujeta a comunicado oficial
+          </h2>
+
+          <p class="text-slate-700 leading-relaxed mb-6">
+            Los requisitos, fechas y horarios pueden variar según las
+            disposiciones internas de la institución y las indicaciones de las
+            autoridades educativas. Por eso, se recomienda revisar siempre los
+            comunicados oficiales publicados en la página.
+          </p>
+
+          <div class="bg-slate-100 rounded-2xl p-5 mb-6">
+            <h3 class="font-bold mb-2">Recomendación</h3>
+            <p class="text-slate-600 text-sm">
+              Antes de acercarte a la institución, confirma la información en la
+              sección de noticias o comunícate mediante la página de contacto.
+            </p>
+          </div>
+
+          <a
+            href="/contacto"
+            class="inline-block bg-[#2F8FC9] hover:bg-[#60B5E8] text-white hover:text-[#0B2344] px-6 py-3 rounded-xl font-semibold transition"
+          >
+            Solicitar información
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- NIVELES -->
+    <section class="px-6 py-20 bg-[#0B2344]">
+      <div class="max-w-6xl mx-auto">
+        <div class="mb-10">
+          <p class="text-[#60B5E8] font-semibold mb-3">
+            Atención educativa
+          </p>
+
+          <h2 class="text-3xl md:text-4xl font-bold">
+            Información por nivel
+          </h2>
+
+          <p class="text-slate-300 mt-4 max-w-3xl">
+            Esta sección puede adaptarse según los niveles que atiende la
+            institución.
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div class="bg-white/10 border border-white/10 rounded-3xl p-6">
+            <div class="text-3xl mb-4">📗</div>
+            <h3 class="text-2xl font-bold mb-3">Primaria</h3>
+            <p class="text-slate-300">
+              Dirigido a estudiantes que ingresan o continúan del 1.º al 6.º grado de primaria. Se recomienda revisar los comunicados oficiales para conocer vacantes, horarios y requisitos actualizados.
+            </p>
+          </div>
+
+          <div class="bg-white/10 border border-white/10 rounded-3xl p-6">
+            <div class="text-3xl mb-4">📘</div>
+            <h3 class="text-2xl font-bold mb-3">Secundaria</h3>
+            <p class="text-slate-300">
+              Dirigido a estudiantes que ingresan o continúan del 1.º al 5.º grado de secundaria. Para estudiantes nuevos, puede solicitarse constancia de estudios o documentación académica anterior.
+            </p>
+          </div>
+          <div class="bg-white/10 border border-white/10 rounded-3xl p-6">
+            <div class="text-3xl mb-4">🆕</div>
+
+            <h3 class="text-2xl font-bold mb-3">
+              Estudiantes nuevos
+            </h3>
+
+            <p class="text-slate-300">
+              Para estudiantes que se incorporan por primera vez a la institución, se
+              recomienda verificar vacantes disponibles y documentos requeridos antes de
+              iniciar el trámite.
+            </p>
+          </div>
+
+          <div class="bg-white/10 border border-white/10 rounded-3xl p-6">
+            <div class="text-3xl mb-4">👨‍👩‍👧</div>
+            <h3 class="text-2xl font-bold mb-3">Apoderados</h3>
+            <p class="text-slate-300">
+              El padre, madre o apoderado debe presentar la documentación solicitada y mantenerse atento a las fechas, comunicados y orientaciones publicadas por la institución.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA FINAL -->
+    <section class="px-6 py-20 bg-gradient-to-br from-[#123C73] to-[#0B2344]">
+      <div class="max-w-6xl mx-auto bg-white rounded-3xl p-8 md:p-12 text-[#0B2344] grid md:grid-cols-2 gap-8 items-center">
+        <div>
+          <p class="font-semibold text-[#2F8FC9] mb-3">
+            ¿Tienes dudas?
+          </p>
+
+          <h2 class="text-3xl md:text-4xl font-extrabold mb-4">
+            Comunícate con la institución
+          </h2>
+
+          <p class="text-slate-700">
+            Si necesitas orientación sobre el proceso de matrícula, puedes
+            comunicarte mediante la página de contacto.
+          </p>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-4 md:justify-end">
+          <a
+            href="/contacto"
+            class="bg-[#2F8FC9] hover:bg-[#60B5E8] text-white hover:text-[#0B2344] px-6 py-3 rounded-xl font-semibold transition text-center"
+          >
+            Ir a contacto
+          </a>
+
+          <a
+            href="/noticias"
+            class="border border-[#0B2344]/20 hover:bg-slate-100 px-6 py-3 rounded-xl font-semibold transition text-center"
+          >
+            Ver comunicados
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</Layout>

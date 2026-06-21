@@ -1,0 +1,116 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Navbar from "../components/Navbar.astro";
+import Footer from "../components/Footer.astro";
+---
+
+<Layout title="Galería | I.E. Luis Fabio Xammar">
+  <Navbar />
+
+  <main class="min-h-screen pt-32 px-6 bg-gradient-to-br from-[#0B2344] via-[#123C73] to-[#0B2344]">
+    <section class="max-w-6xl mx-auto">
+      <p class="text-[#60B5E8] font-semibold mb-3">
+        Galería institucional
+      </p>
+
+      <h1 class="text-4xl md:text-5xl font-bold mb-6">
+        Momentos xammarinos
+      </h1>
+
+      <p class="text-slate-200 text-lg mb-10 max-w-3xl">
+        Fotografías de actividades, ceremonias, aulas, estudiantes, docentes y
+        eventos importantes de nuestra institución.
+      </p>
+
+      <div id="estado-galeria" class="text-slate-300 mb-6">
+        Cargando galería...
+      </div>
+
+      <div
+        id="contenedor-galeria"
+        class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"
+      ></div>
+    </section>
+  </main>
+
+  <Footer />
+</Layout>
+
+<script>
+  import { collection, getDocs } from "firebase/firestore";
+  import { db } from "../firebase/config.js";
+
+  const estadoGaleria = document.getElementById("estado-galeria");
+  const contenedorGaleria = document.getElementById("contenedor-galeria");
+
+  const cargarGaleriaPublica = async () => {
+    if (!(estadoGaleria instanceof HTMLDivElement)) return;
+    if (!(contenedorGaleria instanceof HTMLDivElement)) return;
+
+    try {
+      const resultado = await getDocs(collection(db, "galeria"));
+
+      console.log("Documentos encontrados en galería:", resultado.size);
+
+      if (resultado.empty) {
+        estadoGaleria.textContent = "Todavía no hay imágenes publicadas.";
+        return;
+      }
+
+      estadoGaleria.classList.add("hidden");
+      contenedorGaleria.innerHTML = "";
+
+      resultado.forEach((documento) => {
+        const item = documento.data();
+
+        console.log("Imagen encontrada:", item);
+
+        const imagen = item.imagen || "";
+        const titulo = item.titulo || "Sin título";
+        const descripcion = item.descripcion || "Sin descripción";
+
+        const tarjeta = document.createElement("article");
+
+        tarjeta.className =
+          "group bg-white/10 border border-white/10 rounded-2xl overflow-hidden hover:bg-white/15 transition shadow-xl";
+
+        tarjeta.innerHTML = `
+          <div class="overflow-hidden bg-white/10">
+            ${
+              imagen
+                ? `<img
+                    src="${imagen}"
+                    alt="${titulo}"
+                    class="w-full h-56 object-cover group-hover:scale-105 transition duration-300"
+                  />`
+                : `<div class="w-full h-56 flex items-center justify-center text-slate-300">
+                    Sin imagen
+                  </div>`
+            }
+          </div>
+
+          <div class="p-5">
+            <h2 class="text-xl font-bold mb-2">
+              ${titulo}
+            </h2>
+
+            <p class="text-slate-300 text-sm">
+              ${descripcion}
+            </p>
+          </div>
+        `;
+
+        contenedorGaleria.appendChild(tarjeta);
+      });
+    } catch (error) {
+      console.error("Error al cargar galería:", error);
+
+      estadoGaleria.textContent =
+        "No se pudo cargar la galería. Revisa la consola del navegador.";
+
+      estadoGaleria.className = "text-red-300 mb-6";
+    }
+  };
+
+  cargarGaleriaPublica();
+</script>

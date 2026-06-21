@@ -1,0 +1,540 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Navbar from "../components/Navbar.astro";
+---
+
+<Layout title="Admin Noticias | I.E. Luis Fabio Xammar">
+  <Navbar />
+
+  <main class="min-h-screen pt-32 px-6 bg-gradient-to-br from-[#0B2344] via-[#123C73] to-[#0B2344]">
+    <section class="max-w-6xl mx-auto">
+      <div id="cargando" class="text-center text-slate-300">
+        Verificando sesión...
+      </div>
+
+      <div id="contenido-admin" class="hidden">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-10">
+          <div>
+            <p class="text-[#60B5E8] font-semibold mb-2">
+              Panel administrativo
+            </p>
+
+            <h1 class="text-4xl md:text-5xl font-bold">
+              Administración de noticias
+            </h1>
+
+            <p id="correo-admin" class="text-slate-300 mt-3"></p>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-3">
+            <a
+              href="/admin"
+              class="bg-white/10 border border-white/10 hover:bg-white/15 px-5 py-3 rounded-xl font-semibold transition text-center"
+            >
+              Panel
+            </a>
+
+            <a
+              href="/admin-noticias"
+              class="bg-[#2F8FC9] hover:bg-[#60B5E8] text-white hover:text-[#0B2344] px-5 py-3 rounded-xl font-semibold transition text-center"
+            >
+              Noticias
+            </a>
+
+            <a
+              href="/admin-galeria"
+              class="bg-white/10 border border-white/10 hover:bg-white/15 px-5 py-3 rounded-xl font-semibold transition text-center"
+            >
+              Galería
+            </a>
+
+            <button
+              id="btn-logout"
+              class="bg-white text-[#0B2344] hover:bg-slate-200 px-5 py-3 rounded-xl font-semibold transition"
+            >
+              Cerrar sesión
+            </button>
+          </div>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-8">
+          <form
+            id="form-noticia"
+            class="bg-white/10 border border-white/10 rounded-3xl p-6 space-y-4"
+          >
+            <h2 id="titulo-formulario" class="text-2xl font-bold mb-4">
+              Crear nueva noticia
+            </h2>
+
+            <input
+              id="titulo"
+              type="text"
+              placeholder="Título de la noticia"
+              class="w-full px-4 py-3 rounded-xl bg-[#0B2344] border border-white/10 outline-none focus:border-[#60B5E8]"
+              required
+            />
+
+            <select
+              id="categoria"
+              class="w-full px-4 py-3 rounded-xl bg-[#0B2344] border border-white/10 outline-none focus:border-[#60B5E8]"
+              required
+            >
+              <option value="">Selecciona una categoría</option>
+              <option value="Comunicado">Comunicado</option>
+              <option value="Actividad">Actividad</option>
+              <option value="Aviso">Aviso</option>
+              <option value="Evento">Evento</option>
+            </select>
+
+            <input
+              id="imagen"
+              type="url"
+              placeholder="URL de imagen opcional"
+              class="w-full px-4 py-3 rounded-xl bg-[#0B2344] border border-white/10 outline-none focus:border-[#60B5E8]"
+            />
+
+            <div
+              id="preview-contenedor"
+              class="hidden bg-[#0B2344] border border-white/10 rounded-2xl p-4"
+            >
+              <p class="text-sm text-[#60B5E8] font-semibold mb-3">
+                Vista previa de imagen
+              </p>
+
+              <img
+                id="preview-imagen"
+                src=""
+                alt="Vista previa"
+                class="w-full h-48 object-cover rounded-xl"
+              />
+
+              <p
+                id="preview-error"
+                class="hidden text-red-300 text-sm mt-3"
+              >
+                No se pudo cargar la imagen. Revisa la URL.
+              </p>
+            </div>
+
+            <textarea
+              id="descripcion"
+              placeholder="Descripción de la noticia"
+              rows="5"
+              class="w-full px-4 py-3 rounded-xl bg-[#0B2344] border border-white/10 outline-none focus:border-[#60B5E8]"
+              required
+            ></textarea>
+
+            <button
+              id="btn-guardar"
+              type="submit"
+              class="w-full bg-[#2F8FC9] hover:bg-[#60B5E8] text-white hover:text-[#0B2344] px-6 py-3 rounded-xl font-semibold transition disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              Guardar noticia
+            </button>
+
+            <button
+              id="btn-cancelar"
+              type="button"
+              class="hidden w-full bg-slate-200 hover:bg-white text-[#0B2344] px-6 py-3 rounded-xl font-semibold transition"
+            >
+              Cancelar edición
+            </button>
+
+            <p id="mensaje-noticia" class="text-center text-sm"></p>
+          </form>
+
+          <div class="bg-white/10 border border-white/10 rounded-3xl p-6">
+            <h2 class="text-2xl font-bold mb-4">
+              Noticias registradas
+            </h2>
+
+            <div id="lista-noticias" class="space-y-4">
+              <p class="text-slate-300">Cargando noticias...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</Layout>
+
+<script>
+  import { onAuthStateChanged, signOut } from "firebase/auth";
+  import {
+    addDoc,
+    collection,
+    deleteDoc,
+    doc,
+    getDocs,
+    orderBy,
+    query,
+    serverTimestamp,
+    updateDoc,
+  } from "firebase/firestore";
+  import { auth, db } from "../firebase/config.js";
+
+  const cargando = document.getElementById("cargando");
+  const contenidoAdmin = document.getElementById("contenido-admin");
+  const correoAdmin = document.getElementById("correo-admin");
+  const btnLogout = document.getElementById("btn-logout");
+
+  const formNoticia = document.getElementById("form-noticia");
+  const tituloInput = document.getElementById("titulo");
+  const categoriaInput = document.getElementById("categoria");
+  const imagenInput = document.getElementById("imagen");
+  const descripcionInput = document.getElementById("descripcion");
+  const btnGuardar = document.getElementById("btn-guardar");
+  const btnCancelar = document.getElementById("btn-cancelar");
+  const mensajeNoticia = document.getElementById("mensaje-noticia");
+  const listaNoticias = document.getElementById("lista-noticias");
+  const tituloFormulario = document.getElementById("titulo-formulario");
+
+  const previewContenedor = document.getElementById("preview-contenedor");
+  const previewImagen = document.getElementById("preview-imagen");
+  const previewError = document.getElementById("preview-error");
+
+  let noticiaEditandoId = null;
+
+  const mostrarMensaje = (texto, tipo = "info") => {
+    if (!(mensajeNoticia instanceof HTMLParagraphElement)) return;
+
+    mensajeNoticia.textContent = texto;
+
+    if (tipo === "ok") {
+      mensajeNoticia.className = "text-center text-sm text-green-300";
+    } else if (tipo === "error") {
+      mensajeNoticia.className = "text-center text-sm text-red-300";
+    } else {
+      mensajeNoticia.className = "text-center text-sm text-slate-300";
+    }
+  };
+
+  const actualizarPreview = () => {
+    if (!(imagenInput instanceof HTMLInputElement)) return;
+    if (!(previewContenedor instanceof HTMLDivElement)) return;
+    if (!(previewImagen instanceof HTMLImageElement)) return;
+    if (!(previewError instanceof HTMLParagraphElement)) return;
+
+    const url = imagenInput.value.trim();
+
+    if (!url) {
+      previewContenedor.classList.add("hidden");
+      previewImagen.src = "";
+      previewError.classList.add("hidden");
+      return;
+    }
+
+    previewContenedor.classList.remove("hidden");
+    previewImagen.src = url;
+    previewError.classList.add("hidden");
+
+    previewImagen.onerror = () => {
+      previewError.classList.remove("hidden");
+    };
+
+    previewImagen.onload = () => {
+      previewError.classList.add("hidden");
+    };
+  };
+
+  const limpiarFormulario = () => {
+    if (formNoticia instanceof HTMLFormElement) {
+      formNoticia.reset();
+    }
+
+    noticiaEditandoId = null;
+
+    if (tituloFormulario instanceof HTMLHeadingElement) {
+      tituloFormulario.textContent = "Crear nueva noticia";
+    }
+
+    if (btnGuardar instanceof HTMLButtonElement) {
+      btnGuardar.textContent = "Guardar noticia";
+    }
+
+    if (btnCancelar instanceof HTMLButtonElement) {
+      btnCancelar.classList.add("hidden");
+    }
+
+    if (previewContenedor instanceof HTMLDivElement) {
+      previewContenedor.classList.add("hidden");
+    }
+
+    if (previewImagen instanceof HTMLImageElement) {
+      previewImagen.src = "";
+    }
+
+    if (previewError instanceof HTMLParagraphElement) {
+      previewError.classList.add("hidden");
+    }
+
+    mostrarMensaje("", "info");
+  };
+
+  const cargarNoticias = async () => {
+    if (!(listaNoticias instanceof HTMLDivElement)) return;
+
+    listaNoticias.innerHTML = `
+      <p class="text-slate-300">
+        Cargando noticias...
+      </p>
+    `;
+
+    try {
+      const consulta = query(
+        collection(db, "noticias"),
+        orderBy("fechaCreacion", "desc")
+      );
+
+      const resultado = await getDocs(consulta);
+
+      if (resultado.empty) {
+        listaNoticias.innerHTML = `
+          <p class="text-slate-300">
+            Todavía no hay noticias registradas.
+          </p>
+        `;
+        return;
+      }
+
+      listaNoticias.innerHTML = "";
+
+      resultado.forEach((documento) => {
+        const noticia = documento.data();
+
+        const tarjeta = document.createElement("article");
+
+        tarjeta.className =
+          "bg-[#0B2344] border border-white/10 rounded-2xl p-4";
+
+        tarjeta.innerHTML = `
+          <p class="text-sm text-[#60B5E8] font-semibold mb-1">
+            ${noticia.categoria || "Sin categoría"}
+          </p>
+
+          ${
+            noticia.imagen
+              ? `<img
+                  src="${noticia.imagen}"
+                  alt="${noticia.titulo || "Noticia"}"
+                  class="w-full h-40 object-cover rounded-xl mb-4"
+                />`
+              : ""
+          }
+
+          <h3 class="text-lg font-bold mb-2">
+            ${noticia.titulo || "Sin título"}
+          </h3>
+
+          <p class="text-slate-300 text-sm mb-4">
+            ${noticia.descripcion || "Sin descripción"}
+          </p>
+
+          <div class="flex flex-col sm:flex-row gap-3">
+            <button
+              data-id="${documento.id}"
+              data-titulo="${noticia.titulo || ""}"
+              data-categoria="${noticia.categoria || ""}"
+              data-imagen="${noticia.imagen || ""}"
+              data-descripcion="${noticia.descripcion || ""}"
+              class="btn-editar bg-[#2F8FC9] hover:bg-[#60B5E8] text-white hover:text-[#0B2344] px-4 py-2 rounded-xl text-sm font-semibold transition"
+            >
+              Editar
+            </button>
+
+            <button
+              data-id="${documento.id}"
+              class="btn-eliminar bg-red-600 hover:bg-red-700 px-4 py-2 rounded-xl text-sm font-semibold transition"
+            >
+              Eliminar
+            </button>
+          </div>
+        `;
+
+        listaNoticias.appendChild(tarjeta);
+      });
+
+      const botonesEditar = document.querySelectorAll(".btn-editar");
+
+      botonesEditar.forEach((boton) => {
+        boton.addEventListener("click", () => {
+          if (!(boton instanceof HTMLButtonElement)) return;
+
+          noticiaEditandoId = boton.dataset.id || null;
+
+          if (
+            tituloInput instanceof HTMLInputElement &&
+            categoriaInput instanceof HTMLSelectElement &&
+            imagenInput instanceof HTMLInputElement &&
+            descripcionInput instanceof HTMLTextAreaElement
+          ) {
+            tituloInput.value = boton.dataset.titulo || "";
+            categoriaInput.value = boton.dataset.categoria || "";
+            imagenInput.value = boton.dataset.imagen || "";
+            descripcionInput.value = boton.dataset.descripcion || "";
+          }
+
+          actualizarPreview();
+
+          if (tituloFormulario instanceof HTMLHeadingElement) {
+            tituloFormulario.textContent = "Editar noticia";
+          }
+
+          if (btnGuardar instanceof HTMLButtonElement) {
+            btnGuardar.textContent = "Actualizar noticia";
+          }
+
+          if (btnCancelar instanceof HTMLButtonElement) {
+            btnCancelar.classList.remove("hidden");
+          }
+
+          mostrarMensaje("Editando noticia seleccionada.", "info");
+
+          window.scrollTo({
+            top: 0,
+            behavior: "smooth",
+          });
+        });
+      });
+
+      const botonesEliminar = document.querySelectorAll(".btn-eliminar");
+
+      botonesEliminar.forEach((boton) => {
+        boton.addEventListener("click", async () => {
+          if (!(boton instanceof HTMLButtonElement)) return;
+
+          const id = boton.dataset.id;
+
+          if (!id) return;
+
+          const confirmar = confirm("¿Seguro que deseas eliminar esta noticia?");
+
+          if (!confirmar) return;
+
+          try {
+            await deleteDoc(doc(db, "noticias", id));
+            await cargarNoticias();
+            mostrarMensaje("Noticia eliminada correctamente.", "ok");
+          } catch (error) {
+            console.error(error);
+            alert("No se pudo eliminar la noticia.");
+          }
+        });
+      });
+    } catch (error) {
+      console.error(error);
+
+      listaNoticias.innerHTML = `
+        <p class="text-red-300">
+          Error al cargar las noticias.
+        </p>
+      `;
+    }
+  };
+
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      window.location.href = "/login";
+      return;
+    }
+
+    if (cargando instanceof HTMLDivElement) {
+      cargando.classList.add("hidden");
+    }
+
+    if (contenidoAdmin instanceof HTMLDivElement) {
+      contenidoAdmin.classList.remove("hidden");
+    }
+
+    if (correoAdmin instanceof HTMLParagraphElement) {
+      correoAdmin.textContent = `Sesión iniciada como: ${user.email}`;
+    }
+
+    await cargarNoticias();
+  });
+
+  if (btnLogout instanceof HTMLButtonElement) {
+    btnLogout.addEventListener("click", async () => {
+      try {
+        await signOut(auth);
+        window.location.href = "/login";
+      } catch (error) {
+        console.error(error);
+        alert("No se pudo cerrar sesión.");
+      }
+    });
+  }
+
+  if (btnCancelar instanceof HTMLButtonElement) {
+    btnCancelar.addEventListener("click", () => {
+      limpiarFormulario();
+    });
+  }
+
+  if (
+    formNoticia instanceof HTMLFormElement &&
+    tituloInput instanceof HTMLInputElement &&
+    categoriaInput instanceof HTMLSelectElement &&
+    imagenInput instanceof HTMLInputElement &&
+    descripcionInput instanceof HTMLTextAreaElement &&
+    btnGuardar instanceof HTMLButtonElement
+  ) {
+    imagenInput.addEventListener("input", actualizarPreview);
+
+    formNoticia.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const titulo = tituloInput.value.trim();
+      const categoria = categoriaInput.value;
+      const imagen = imagenInput.value.trim();
+      const descripcion = descripcionInput.value.trim();
+
+      if (!titulo || !categoria || !descripcion) {
+        mostrarMensaje("Completa el título, la categoría y la descripción.", "error");
+        return;
+      }
+
+      btnGuardar.disabled = true;
+
+      btnGuardar.textContent = noticiaEditandoId
+        ? "Actualizando..."
+        : "Guardando...";
+
+      try {
+        if (noticiaEditandoId) {
+          await updateDoc(doc(db, "noticias", noticiaEditandoId), {
+            titulo,
+            categoria,
+            imagen,
+            descripcion,
+            fechaActualizacion: serverTimestamp(),
+          });
+
+          mostrarMensaje("Noticia actualizada correctamente.", "ok");
+        } else {
+          await addDoc(collection(db, "noticias"), {
+            titulo,
+            categoria,
+            imagen,
+            descripcion,
+            fechaCreacion: serverTimestamp(),
+          });
+
+          mostrarMensaje("Noticia guardada correctamente.", "ok");
+        }
+
+        limpiarFormulario();
+        await cargarNoticias();
+      } catch (error) {
+        console.error(error);
+        mostrarMensaje("Error al guardar la noticia.", "error");
+      } finally {
+        btnGuardar.disabled = false;
+
+        btnGuardar.textContent = noticiaEditandoId
+          ? "Actualizar noticia"
+          : "Guardar noticia";
+      }
+    });
+  }
+</script>

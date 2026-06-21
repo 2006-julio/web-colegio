@@ -1,0 +1,317 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Navbar from "../components/Navbar.astro";
+---
+
+<Layout title="Admin Mensajes | I.E. Luis Fabio Xammar">
+  <Navbar />
+
+  <main class="min-h-screen pt-32 px-6 bg-gradient-to-br from-[#0B2344] via-[#123C73] to-[#0B2344]">
+    <section class="max-w-6xl mx-auto">
+      <div id="cargando" class="text-center text-slate-300">
+        Verificando sesión...
+      </div>
+
+      <div id="contenido-admin" class="hidden">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-10">
+          <div>
+            <p class="text-[#60B5E8] font-semibold mb-2">
+              Panel administrativo
+            </p>
+
+            <h1 class="text-4xl md:text-5xl font-bold">
+              Mensajes recibidos
+            </h1>
+
+            <p id="correo-admin" class="text-slate-300 mt-3"></p>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-3">
+            <a
+              href="/admin"
+              class="bg-white/10 border border-white/10 hover:bg-white/15 px-5 py-3 rounded-xl font-semibold transition text-center"
+            >
+              Panel
+            </a>
+
+            <a
+              href="/admin-noticias"
+              class="bg-white/10 border border-white/10 hover:bg-white/15 px-5 py-3 rounded-xl font-semibold transition text-center"
+            >
+              Noticias
+            </a>
+
+            <a
+              href="/admin-galeria"
+              class="bg-white/10 border border-white/10 hover:bg-white/15 px-5 py-3 rounded-xl font-semibold transition text-center"
+            >
+              Galería
+            </a>
+
+            <a
+              href="/admin-mensajes"
+              class="bg-[#2F8FC9] hover:bg-[#60B5E8] text-white hover:text-[#0B2344] px-5 py-3 rounded-xl font-semibold transition text-center"
+            >
+              Mensajes
+            </a>
+
+            <button
+              id="btn-logout"
+              class="bg-white text-[#0B2344] hover:bg-slate-200 px-5 py-3 rounded-xl font-semibold transition"
+            >
+              Cerrar sesión
+            </button>
+          </div>
+        </div>
+
+        <div class="bg-white/10 border border-white/10 rounded-3xl p-6">
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+            <div>
+              <h2 class="text-2xl font-bold">
+                Bandeja de mensajes
+              </h2>
+
+              <p class="text-slate-300 mt-2">
+                Aquí aparecen los mensajes enviados desde la página de contacto.
+              </p>
+            </div>
+
+            <button
+              id="btn-recargar"
+              class="bg-[#2F8FC9] hover:bg-[#60B5E8] text-white hover:text-[#0B2344] px-5 py-3 rounded-xl font-semibold transition"
+            >
+              Recargar
+            </button>
+          </div>
+
+          <div id="lista-mensajes" class="space-y-4">
+            <p class="text-slate-300">Cargando mensajes...</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</Layout>
+
+<script>
+  import { onAuthStateChanged, signOut } from "firebase/auth";
+  import {
+    collection,
+    deleteDoc,
+    doc,
+    getDocs,
+    orderBy,
+    query,
+    updateDoc,
+  } from "firebase/firestore";
+  import { auth, db } from "../firebase/config.js";
+
+  const cargando = document.getElementById("cargando");
+  const contenidoAdmin = document.getElementById("contenido-admin");
+  const correoAdmin = document.getElementById("correo-admin");
+  const btnLogout = document.getElementById("btn-logout");
+  const btnRecargar = document.getElementById("btn-recargar");
+  const listaMensajes = document.getElementById("lista-mensajes");
+
+  const formatearFecha = (fechaFirebase) => {
+    if (!fechaFirebase || typeof fechaFirebase.toDate !== "function") {
+      return "Fecha no disponible";
+    }
+
+    const fecha = fechaFirebase.toDate();
+
+    return fecha.toLocaleDateString("es-PE", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  const cargarMensajes = async () => {
+    if (!(listaMensajes instanceof HTMLDivElement)) return;
+
+    listaMensajes.innerHTML = `
+      <p class="text-slate-300">
+        Cargando mensajes...
+      </p>
+    `;
+
+    try {
+      const consulta = query(
+        collection(db, "mensajes"),
+        orderBy("fechaCreacion", "desc")
+      );
+
+      const resultado = await getDocs(consulta);
+
+      if (resultado.empty) {
+        listaMensajes.innerHTML = `
+          <p class="text-slate-300">
+            Todavía no hay mensajes recibidos.
+          </p>
+        `;
+        return;
+      }
+
+      listaMensajes.innerHTML = "";
+
+      resultado.forEach((documento) => {
+        const mensaje = documento.data();
+
+        const esNuevo = mensaje.estado === "nuevo";
+
+        const tarjeta = document.createElement("article");
+
+        tarjeta.className = esNuevo
+          ? "bg-[#0B2344] border border-[#60B5E8]/50 rounded-2xl p-5"
+          : "bg-[#0B2344] border border-white/10 rounded-2xl p-5 opacity-80";
+
+        tarjeta.innerHTML = `
+          <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-4">
+            <div>
+              <div class="flex items-center gap-3 mb-2">
+                <span class="${
+                  esNuevo
+                    ? "bg-[#60B5E8] text-[#0B2344]"
+                    : "bg-slate-600 text-white"
+                } px-3 py-1 rounded-full text-xs font-bold">
+                  ${esNuevo ? "Nuevo" : "Leído"}
+                </span>
+
+                <p class="text-xs text-slate-400">
+                  ${formatearFecha(mensaje.fechaCreacion)}
+                </p>
+              </div>
+
+              <h3 class="text-xl font-bold mb-1">
+                ${mensaje.asunto || "Sin asunto"}
+              </h3>
+
+              <p class="text-slate-300 text-sm">
+                De: ${mensaje.nombre || "Sin nombre"} · ${mensaje.correo || "Sin correo"}
+              </p>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3">
+              <button
+                data-id="${documento.id}"
+                class="btn-leido bg-[#2F8FC9] hover:bg-[#60B5E8] text-white hover:text-[#0B2344] px-4 py-2 rounded-xl text-sm font-semibold transition"
+              >
+                Marcar leído
+              </button>
+
+              <button
+                data-id="${documento.id}"
+                class="btn-eliminar bg-red-600 hover:bg-red-700 px-4 py-2 rounded-xl text-sm font-semibold transition"
+              >
+                Eliminar
+              </button>
+            </div>
+          </div>
+
+          <div class="bg-white/5 border border-white/10 rounded-2xl p-4">
+            <p class="text-slate-200 leading-relaxed">
+              ${mensaje.mensaje || "Sin mensaje"}
+            </p>
+          </div>
+        `;
+
+        listaMensajes.appendChild(tarjeta);
+      });
+
+      const botonesLeido = document.querySelectorAll(".btn-leido");
+
+      botonesLeido.forEach((boton) => {
+        boton.addEventListener("click", async () => {
+          if (!(boton instanceof HTMLButtonElement)) return;
+
+          const id = boton.dataset.id;
+          if (!id) return;
+
+          try {
+            await updateDoc(doc(db, "mensajes", id), {
+              estado: "leido",
+            });
+
+            await cargarMensajes();
+          } catch (error) {
+            console.error(error);
+            alert("No se pudo marcar el mensaje como leído.");
+          }
+        });
+      });
+
+      const botonesEliminar = document.querySelectorAll(".btn-eliminar");
+
+      botonesEliminar.forEach((boton) => {
+        boton.addEventListener("click", async () => {
+          if (!(boton instanceof HTMLButtonElement)) return;
+
+          const id = boton.dataset.id;
+          if (!id) return;
+
+          const confirmar = confirm("¿Seguro que deseas eliminar este mensaje?");
+
+          if (!confirmar) return;
+
+          try {
+            await deleteDoc(doc(db, "mensajes", id));
+            await cargarMensajes();
+          } catch (error) {
+            console.error(error);
+            alert("No se pudo eliminar el mensaje.");
+          }
+        });
+      });
+    } catch (error) {
+      console.error(error);
+
+      listaMensajes.innerHTML = `
+        <p class="text-red-300">
+          Error al cargar los mensajes. Revisa las reglas de Firestore.
+        </p>
+      `;
+    }
+  };
+
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      window.location.href = "/login";
+      return;
+    }
+
+    if (cargando instanceof HTMLDivElement) {
+      cargando.classList.add("hidden");
+    }
+
+    if (contenidoAdmin instanceof HTMLDivElement) {
+      contenidoAdmin.classList.remove("hidden");
+    }
+
+    if (correoAdmin instanceof HTMLParagraphElement) {
+      correoAdmin.textContent = `Sesión iniciada como: ${user.email}`;
+    }
+
+    await cargarMensajes();
+  });
+
+  if (btnLogout instanceof HTMLButtonElement) {
+    btnLogout.addEventListener("click", async () => {
+      try {
+        await signOut(auth);
+        window.location.href = "/login";
+      } catch (error) {
+        console.error(error);
+        alert("No se pudo cerrar sesión.");
+      }
+    });
+  }
+
+  if (btnRecargar instanceof HTMLButtonElement) {
+    btnRecargar.addEventListener("click", async () => {
+      await cargarMensajes();
+    });
+  }
+</script>

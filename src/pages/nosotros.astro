@@ -1,0 +1,231 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Navbar from "../components/Navbar.astro";
+import Footer from "../components/Footer.astro";
+---
+
+<Layout title="Nosotros | I.E. Luis Fabio Xammar">
+  <Navbar />
+
+  <main class="min-h-screen pt-32 bg-gradient-to-br from-[#0B2344] via-[#123C73] to-[#0B2344]">
+    <!-- PRESENTACIÓN -->
+    <section class="px-6 pb-20">
+      <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+        <div>
+          <p class="text-[#60B5E8] font-semibold mb-4">
+            Sobre nuestra institución
+          </p>
+
+          <h1 class="text-4xl md:text-6xl font-bold leading-tight mb-6">
+            I.E. Luis Fabio Xammar
+          </h1>
+
+          <p class="text-slate-200 text-lg leading-relaxed mb-6">
+            Somos una institución educativa comprometida con la formación
+            integral de nuestros estudiantes, promoviendo el aprendizaje, los
+            valores, la disciplina, la responsabilidad y la identidad
+            xammarina.
+          </p>
+
+          <p class="text-slate-300 leading-relaxed">
+            Nuestra comunidad educativa trabaja con el objetivo de formar
+            estudiantes preparados para afrontar los retos académicos, sociales
+            y personales, fortaleciendo el respeto, el compromiso y el orgullo
+            institucional.
+          </p>
+        </div>
+
+        <div class="relative bg-white/10 border border-white/10 rounded-3xl p-6 shadow-2xl overflow-hidden">
+          <div class="absolute -top-20 -right-20 w-52 h-52 bg-[#60B5E8]/30 rounded-full blur-3xl"></div>
+          <div class="absolute -bottom-20 -left-20 w-52 h-52 bg-white/20 rounded-full blur-3xl"></div>
+
+          <div class="relative bg-white rounded-2xl p-8 text-center text-[#0B2344]">
+            <div class="w-44 h-44 mx-auto rounded-full bg-white shadow-xl border border-slate-200 p-5 flex items-center justify-center mb-6">
+              <img
+                src="/img/insigniaxammar.jpg"
+                alt="Insignia I.E. Luis Fabio Xammar"
+                class="w-full h-full object-contain"
+              />
+            </div>
+
+            <p class="text-[#2F8FC9] font-semibold">
+              Institución Educativa
+            </p>
+
+            <h2 class="text-2xl md:text-3xl font-extrabold mt-1">
+              Luis Fabio Xammar
+            </h2>
+
+            <p class="text-slate-600 mt-4">
+              Educación, identidad y orgullo xammarino.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MISIÓN Y VISIÓN -->
+    <section class="px-6 py-20 bg-[#0B2344]">
+      <div class="max-w-6xl mx-auto">
+        <div class="text-center mb-12">
+          <p class="text-[#60B5E8] font-semibold mb-3">
+            Nuestro propósito
+          </p>
+
+          <h2 class="text-3xl md:text-4xl font-bold">
+            Misión y visión institucional
+          </h2>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="bg-white/10 border border-white/10 rounded-3xl p-8">
+            <div class="w-14 h-14 rounded-2xl bg-[#2F8FC9] flex items-center justify-center text-2xl mb-5">
+              🎯
+            </div>
+
+            <h3 class="text-2xl font-bold mb-4 text-[#60B5E8]">
+              Misión
+            </h3>
+
+            <p class="text-slate-300 leading-relaxed">
+              Brindar una educación de calidad orientada al desarrollo integral
+              de los estudiantes, fortaleciendo sus conocimientos, valores,
+              habilidades y compromiso con la comunidad.
+            </p>
+          </div>
+
+          <div class="bg-white/10 border border-white/10 rounded-3xl p-8">
+            <div class="w-14 h-14 rounded-2xl bg-[#2F8FC9] flex items-center justify-center text-2xl mb-5">
+              🚀
+            </div>
+
+            <h3 class="text-2xl font-bold mb-4 text-[#60B5E8]">
+              Visión
+            </h3>
+
+            <p class="text-slate-300 leading-relaxed">
+              Ser una institución reconocida por su excelencia académica,
+              innovación educativa, formación en valores e identidad
+              institucional, contribuyendo al desarrollo de la sociedad.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VALORES -->
+    <section class="px-6 py-20 bg-gradient-to-br from-[#123C73] to-[#0B2344]">
+      <div class="max-w-6xl mx-auto">
+        <div class="mb-12">
+          <p class="text-[#60B5E8] font-semibold mb-3">
+            Formación con valores
+          </p>
+
+          <h2 class="text-3xl md:text-4xl font-bold mb-4">
+            Valores que nos representan
+          </h2>
+
+          <p class="text-slate-300 max-w-3xl">
+            Nuestros valores fortalecen la convivencia escolar, la identidad
+            institucional y el desarrollo personal de cada estudiante.
+          </p>
+        </div>
+
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div class="bg-white rounded-3xl p-6 text-[#0B2344]">
+            <div class="text-3xl mb-4">🤝</div>
+            <h3 class="text-xl font-bold mb-2">Respeto</h3>
+            <p class="text-slate-600 text-sm">
+              Promovemos una convivencia basada en el buen trato y la empatía.
+            </p>
+          </div>
+
+          <div class="bg-white rounded-3xl p-6 text-[#0B2344]">
+            <div class="text-3xl mb-4">📘</div>
+            <h3 class="text-xl font-bold mb-2">Responsabilidad</h3>
+            <p class="text-slate-600 text-sm">
+              Fomentamos el compromiso con el estudio, la familia y la comunidad.
+            </p>
+          </div>
+
+          <div class="bg-white rounded-3xl p-6 text-[#0B2344]">
+            <div class="text-3xl mb-4">🛡️</div>
+            <h3 class="text-xl font-bold mb-2">Disciplina</h3>
+            <p class="text-slate-600 text-sm">
+              Valoramos el orden, la constancia y el esfuerzo diario.
+            </p>
+          </div>
+
+          <div class="bg-white rounded-3xl p-6 text-[#0B2344]">
+            <div class="text-3xl mb-4">🏫</div>
+            <h3 class="text-xl font-bold mb-2">Identidad</h3>
+            <p class="text-slate-600 text-sm">
+              Fortalecemos el orgullo de pertenecer a la familia xammarina.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DATOS VISUALES -->
+    <section class="px-6 py-20 bg-[#0B2344]">
+      <div class="max-w-6xl mx-auto">
+        <div class="grid sm:grid-cols-2 md:grid-cols-4 gap-6 text-center">
+          <div class="bg-white/10 border border-white/10 rounded-3xl p-6">
+            <p class="text-4xl font-extrabold text-[#60B5E8]">+50</p>
+            <p class="text-slate-300 mt-2">Años de historia</p>
+          </div>
+
+          <div class="bg-white/10 border border-white/10 rounded-3xl p-6">
+            <p class="text-4xl font-extrabold text-[#60B5E8]">+1000</p>
+            <p class="text-slate-300 mt-2">Estudiantes</p>
+          </div>
+
+          <div class="bg-white/10 border border-white/10 rounded-3xl p-6">
+            <p class="text-4xl font-extrabold text-[#60B5E8]">+60</p>
+            <p class="text-slate-300 mt-2">Docentes</p>
+          </div>
+
+          <div class="bg-white/10 border border-white/10 rounded-3xl p-6">
+            <p class="text-4xl font-extrabold text-[#60B5E8]">1</p>
+            <p class="text-slate-300 mt-2">Comunidad educativa</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- IDENTIDAD -->
+    <section class="px-6 py-20 bg-gradient-to-br from-[#123C73] to-[#0B2344]">
+      <div class="max-w-6xl mx-auto bg-white rounded-3xl p-8 md:p-12 text-[#0B2344] grid md:grid-cols-2 gap-8 items-center">
+        <div>
+          <p class="font-semibold text-[#2F8FC9] mb-3">
+            Orgullo xammarino
+          </p>
+
+          <h2 class="text-3xl md:text-4xl font-extrabold mb-4">
+            Una comunidad que educa con identidad
+          </h2>
+
+          <p class="text-slate-700 leading-relaxed">
+            La I.E. Luis Fabio Xammar representa una comunidad educativa que
+            valora la historia, el esfuerzo, la formación académica y el
+            compromiso de estudiantes, docentes, familias y autoridades.
+          </p>
+        </div>
+
+        <div class="bg-[#0B2344] rounded-3xl p-6 text-white">
+          <p class="text-[#60B5E8] font-semibold mb-3">
+            Nuestro compromiso
+          </p>
+
+          <p class="text-slate-200 leading-relaxed">
+            Seguir formando estudiantes con valores, responsabilidad e identidad,
+            preparados para construir un mejor futuro.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</Layout>

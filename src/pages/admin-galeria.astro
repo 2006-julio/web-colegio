@@ -1,0 +1,513 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Navbar from "../components/Navbar.astro";
+---
+
+<Layout title="Admin Galería | I.E. Luis Fabio Xammar">
+  <Navbar />
+
+  <main class="min-h-screen pt-32 px-6 bg-gradient-to-br from-[#0B2344] via-[#123C73] to-[#0B2344]">
+    <section class="max-w-6xl mx-auto">
+      <div id="cargando" class="text-center text-slate-300">
+        Verificando sesión...
+      </div>
+
+      <div id="contenido-admin" class="hidden">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-10">
+          <div>
+            <p class="text-[#60B5E8] font-semibold mb-2">
+              Panel administrativo
+            </p>
+
+            <h1 class="text-4xl md:text-5xl font-bold">
+              Administración de galería
+            </h1>
+
+            <p id="correo-admin" class="text-slate-300 mt-3"></p>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-3">
+            <a
+              href="/admin"
+              class="bg-white/10 border border-white/10 hover:bg-white/15 px-5 py-3 rounded-xl font-semibold transition text-center"
+            >
+              Panel
+            </a>
+
+            <a
+              href="/admin-noticias"
+              class="bg-white/10 border border-white/10 hover:bg-white/15 px-5 py-3 rounded-xl font-semibold transition text-center"
+            >
+              Noticias
+            </a>
+
+            <a
+              href="/admin-galeria"
+              class="bg-[#2F8FC9] hover:bg-[#60B5E8] text-white hover:text-[#0B2344] px-5 py-3 rounded-xl font-semibold transition text-center"
+            >
+              Galería
+            </a>
+
+            <button
+              id="btn-logout"
+              class="bg-white text-[#0B2344] hover:bg-slate-200 px-5 py-3 rounded-xl font-semibold transition"
+            >
+              Cerrar sesión
+            </button>
+          </div>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-8">
+          <form
+            id="form-galeria"
+            class="bg-white/10 border border-white/10 rounded-3xl p-6 space-y-4"
+          >
+            <h2 id="titulo-formulario" class="text-2xl font-bold mb-4">
+              Agregar imagen a la galería
+            </h2>
+
+            <input
+              id="titulo"
+              type="text"
+              placeholder="Título de la imagen"
+              class="w-full px-4 py-3 rounded-xl bg-[#0B2344] border border-white/10 outline-none focus:border-[#60B5E8]"
+              required
+            />
+
+            <input
+              id="imagen"
+              type="url"
+              placeholder="URL de la imagen"
+              class="w-full px-4 py-3 rounded-xl bg-[#0B2344] border border-white/10 outline-none focus:border-[#60B5E8]"
+              required
+            />
+            <div
+              id="preview-contenedor"
+              class="hidden bg-[#0B2344] border border-white/10 rounded-2xl p-4"
+            >
+              <p class="text-sm text-[#60B5E8] font-semibold mb-3">
+                Vista previa
+              </p>
+
+              <img
+                id="preview-imagen"
+                src=""
+                alt="Vista previa"
+                class="w-full h-48 object-cover rounded-xl"
+              />
+
+              <p
+                id="preview-error"
+                class="hidden text-red-300 text-sm mt-3"
+              >
+                No se pudo cargar la imagen. Revisa la URL.
+              </p>
+            </div>
+
+            <textarea
+              id="descripcion"
+              placeholder="Descripción opcional"
+              rows="4"
+              class="w-full px-4 py-3 rounded-xl bg-[#0B2344] border border-white/10 outline-none focus:border-[#60B5E8]"
+            ></textarea>
+
+            <button
+              id="btn-guardar"
+              type="submit"
+              class="w-full bg-[#2F8FC9] hover:bg-[#60B5E8] text-white hover:text-[#0B2344] px-6 py-3 rounded-xl font-semibold transition disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              Guardar imagen
+            </button>
+
+            <button
+              id="btn-cancelar"
+              type="button"
+              class="hidden w-full bg-slate-200 hover:bg-white text-[#0B2344] px-6 py-3 rounded-xl font-semibold transition"
+            >
+              Cancelar edición
+            </button>
+
+            <p id="mensaje-galeria" class="text-center text-sm"></p>
+          </form>
+
+          <div class="bg-white/10 border border-white/10 rounded-3xl p-6">
+            <h2 class="text-2xl font-bold mb-4">
+              Imágenes registradas
+            </h2>
+
+            <div id="lista-galeria" class="space-y-4">
+              <p class="text-slate-300">Cargando imágenes...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</Layout>
+
+<script>
+  import { onAuthStateChanged, signOut } from "firebase/auth";
+  import {
+    addDoc,
+    collection,
+    deleteDoc,
+    doc,
+    getDocs,
+    orderBy,
+    query,
+    serverTimestamp,
+    updateDoc,
+  } from "firebase/firestore";
+  import { auth, db } from "../firebase/config.js";
+
+  const cargando = document.getElementById("cargando");
+  const contenidoAdmin = document.getElementById("contenido-admin");
+  const correoAdmin = document.getElementById("correo-admin");
+  const btnLogout = document.getElementById("btn-logout");
+
+  const formGaleria = document.getElementById("form-galeria");
+  const tituloInput = document.getElementById("titulo");
+  const imagenInput = document.getElementById("imagen");
+  const previewContenedor = document.getElementById("preview-contenedor");
+  const previewImagen = document.getElementById("preview-imagen");
+  const previewError = document.getElementById("preview-error");
+  const descripcionInput = document.getElementById("descripcion");
+  const btnGuardar = document.getElementById("btn-guardar");
+  const btnCancelar = document.getElementById("btn-cancelar");
+  const mensajeGaleria = document.getElementById("mensaje-galeria");
+  const listaGaleria = document.getElementById("lista-galeria");
+  const tituloFormulario = document.getElementById("titulo-formulario");
+
+  let imagenEditandoId = null;
+
+  const mostrarMensaje = (texto, tipo = "info") => {
+    if (!(mensajeGaleria instanceof HTMLParagraphElement)) return;
+
+    mensajeGaleria.textContent = texto;
+
+    if (tipo === "ok") {
+      mensajeGaleria.className = "text-center text-sm text-green-300";
+    } else if (tipo === "error") {
+      mensajeGaleria.className = "text-center text-sm text-red-300";
+    } else {
+      mensajeGaleria.className = "text-center text-sm text-slate-300";
+    }
+  };
+  const actualizarPreview = () => {
+    if (!(imagenInput instanceof HTMLInputElement)) return;
+    if (!(previewContenedor instanceof HTMLDivElement)) return;
+    if (!(previewImagen instanceof HTMLImageElement)) return;
+    if (!(previewError instanceof HTMLParagraphElement)) return;
+
+    const url = imagenInput.value.trim();
+
+    if (!url) {
+      previewContenedor.classList.add("hidden");
+      previewImagen.src = "";
+      previewError.classList.add("hidden");
+      return;
+    }
+
+    previewContenedor.classList.remove("hidden");
+    previewImagen.src = url;
+    previewError.classList.add("hidden");
+
+    previewImagen.onerror = () => {
+      previewError.classList.remove("hidden");
+    };
+
+    previewImagen.onload = () => {
+      previewError.classList.add("hidden");
+    };
+  };
+  const limpiarFormulario = () => {
+    if (formGaleria instanceof HTMLFormElement) {
+      formGaleria.reset();
+    }
+
+    imagenEditandoId = null;
+
+    if (tituloFormulario instanceof HTMLHeadingElement) {
+      tituloFormulario.textContent = "Agregar imagen a la galería";
+    }
+
+    if (btnGuardar instanceof HTMLButtonElement) {
+      btnGuardar.textContent = "Guardar imagen";
+    }
+
+    if (btnCancelar instanceof HTMLButtonElement) {
+      btnCancelar.classList.add("hidden");
+    }
+    if (previewContenedor instanceof HTMLDivElement) {
+      previewContenedor.classList.add("hidden");
+    }
+
+    if (previewImagen instanceof HTMLImageElement) {
+      previewImagen.src = "";
+    }
+
+    if (previewError instanceof HTMLParagraphElement) {
+      previewError.classList.add("hidden");
+    }
+
+    mostrarMensaje("", "info");
+  };
+
+  const cargarGaleria = async () => {
+    if (!(listaGaleria instanceof HTMLDivElement)) return;
+
+    listaGaleria.innerHTML = `
+      <p class="text-slate-300">
+        Cargando imágenes...
+      </p>
+    `;
+
+    try {
+      const consulta = query(
+        collection(db, "galeria"),
+        orderBy("fechaCreacion", "desc")
+      );
+
+      const resultado = await getDocs(consulta);
+
+      if (resultado.empty) {
+        listaGaleria.innerHTML = `
+          <p class="text-slate-300">
+            Todavía no hay imágenes registradas.
+          </p>
+        `;
+        return;
+      }
+
+      listaGaleria.innerHTML = "";
+
+      resultado.forEach((documento) => {
+        const item = documento.data();
+
+        const tarjeta = document.createElement("article");
+
+        tarjeta.className =
+          "bg-[#0B2344] border border-white/10 rounded-2xl p-4";
+
+        tarjeta.innerHTML = `
+          ${
+            item.imagen
+              ? `<img
+                  src="${item.imagen}"
+                  alt="${item.titulo || "Imagen"}"
+                  class="w-full h-40 object-cover rounded-xl mb-4"
+                />`
+              : `
+                <div class="w-full h-40 bg-white/10 rounded-xl mb-4 flex items-center justify-center text-slate-300">
+                  Sin imagen
+                </div>
+              `
+          }
+
+          <h3 class="text-lg font-bold mb-2">
+            ${item.titulo || "Sin título"}
+          </h3>
+
+          <p class="text-slate-300 text-sm mb-4">
+            ${item.descripcion || "Sin descripción"}
+          </p>
+
+          <div class="flex flex-col sm:flex-row gap-3">
+            <button
+              data-id="${documento.id}"
+              data-titulo="${item.titulo || ""}"
+              data-imagen="${item.imagen || ""}"
+              data-descripcion="${item.descripcion || ""}"
+              class="btn-editar bg-[#2F8FC9] hover:bg-[#60B5E8] text-white hover:text-[#0B2344] px-4 py-2 rounded-xl text-sm font-semibold transition"
+            >
+              Editar
+            </button>
+
+            <button
+              data-id="${documento.id}"
+              class="btn-eliminar bg-red-600 hover:bg-red-700 px-4 py-2 rounded-xl text-sm font-semibold transition"
+            >
+              Eliminar
+            </button>
+          </div>
+        `;
+
+        listaGaleria.appendChild(tarjeta);
+      });
+
+      const botonesEditar = document.querySelectorAll(".btn-editar");
+
+      botonesEditar.forEach((boton) => {
+        boton.addEventListener("click", () => {
+          if (!(boton instanceof HTMLButtonElement)) return;
+
+          imagenEditandoId = boton.dataset.id || null;
+
+          if (
+            tituloInput instanceof HTMLInputElement &&
+            imagenInput instanceof HTMLInputElement &&
+            descripcionInput instanceof HTMLTextAreaElement
+          ) {
+            tituloInput.value = boton.dataset.titulo || "";
+            imagenInput.value = boton.dataset.imagen || "";
+            descripcionInput.value = boton.dataset.descripcion || "";
+            actualizarPreview();
+          }
+
+          if (tituloFormulario instanceof HTMLHeadingElement) {
+            tituloFormulario.textContent = "Editar imagen";
+          }
+
+          if (btnGuardar instanceof HTMLButtonElement) {
+            btnGuardar.textContent = "Actualizar imagen";
+          }
+
+          if (btnCancelar instanceof HTMLButtonElement) {
+            btnCancelar.classList.remove("hidden");
+          }
+
+          mostrarMensaje("Editando imagen seleccionada.", "info");
+
+          window.scrollTo({
+            top: 0,
+            behavior: "smooth",
+          });
+        });
+      });
+
+      const botonesEliminar = document.querySelectorAll(".btn-eliminar");
+
+      botonesEliminar.forEach((boton) => {
+        boton.addEventListener("click", async () => {
+          if (!(boton instanceof HTMLButtonElement)) return;
+
+          const id = boton.dataset.id;
+
+          if (!id) return;
+
+          const confirmar = confirm("¿Seguro que deseas eliminar esta imagen?");
+
+          if (!confirmar) return;
+
+          try {
+            await deleteDoc(doc(db, "galeria", id));
+            await cargarGaleria();
+            mostrarMensaje("Imagen eliminada correctamente.", "ok");
+          } catch (error) {
+            console.error(error);
+            alert("No se pudo eliminar la imagen.");
+          }
+        });
+      });
+    } catch (error) {
+      console.error(error);
+
+      listaGaleria.innerHTML = `
+        <p class="text-red-300">
+          Error al cargar las imágenes.
+        </p>
+      `;
+    }
+  };
+
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      window.location.href = "/login";
+      return;
+    }
+
+    if (cargando instanceof HTMLDivElement) {
+      cargando.classList.add("hidden");
+    }
+
+    if (contenidoAdmin instanceof HTMLDivElement) {
+      contenidoAdmin.classList.remove("hidden");
+    }
+
+    if (correoAdmin instanceof HTMLParagraphElement) {
+      correoAdmin.textContent = `Sesión iniciada como: ${user.email}`;
+    }
+
+    await cargarGaleria();
+  });
+
+  if (btnLogout instanceof HTMLButtonElement) {
+    btnLogout.addEventListener("click", async () => {
+      try {
+        await signOut(auth);
+        window.location.href = "/login";
+      } catch (error) {
+        console.error(error);
+        alert("No se pudo cerrar sesión.");
+      }
+    });
+  }
+
+  if (btnCancelar instanceof HTMLButtonElement) {
+    btnCancelar.addEventListener("click", () => {
+      limpiarFormulario();
+    });
+  }
+
+  if (
+    formGaleria instanceof HTMLFormElement &&
+    tituloInput instanceof HTMLInputElement &&
+    imagenInput instanceof HTMLInputElement &&
+    descripcionInput instanceof HTMLTextAreaElement &&
+    btnGuardar instanceof HTMLButtonElement
+  ) {
+    imagenInput.addEventListener("input", actualizarPreview);
+    formGaleria.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const titulo = tituloInput.value.trim();
+      const imagen = imagenInput.value.trim();
+      const descripcion = descripcionInput.value.trim();
+
+      if (!titulo || !imagen) {
+        mostrarMensaje("Completa el título y la URL de imagen.", "error");
+        return;
+      }
+
+      btnGuardar.disabled = true;
+
+      btnGuardar.textContent = imagenEditandoId
+        ? "Actualizando..."
+        : "Guardando...";
+
+      try {
+        if (imagenEditandoId) {
+          await updateDoc(doc(db, "galeria", imagenEditandoId), {
+            titulo,
+            imagen,
+            descripcion,
+            fechaActualizacion: serverTimestamp(),
+          });
+
+          mostrarMensaje("Imagen actualizada correctamente.", "ok");
+        } else {
+          await addDoc(collection(db, "galeria"), {
+            titulo,
+            imagen,
+            descripcion,
+            fechaCreacion: serverTimestamp(),
+          });
+
+          mostrarMensaje("Imagen guardada correctamente.", "ok");
+        }
+
+        limpiarFormulario();
+        await cargarGaleria();
+      } catch (error) {
+        console.error(error);
+        mostrarMensaje("Error al guardar la imagen.", "error");
+      } finally {
+        btnGuardar.disabled = false;
+
+        btnGuardar.textContent = imagenEditandoId
+          ? "Actualizar imagen"
+          : "Guardar imagen";
+      }
+    });
+  }
+</script>

@@ -1,0 +1,219 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Navbar from "../components/Navbar.astro";
+import Footer from "../components/Footer.astro";
+---
+
+<Layout title="Noticias | I.E. Luis Fabio Xammar">
+  <Navbar />
+
+  <main class="min-h-screen pt-32 px-6 bg-gradient-to-br from-[#0B2344] via-[#123C73] to-[#0B2344]">
+    <section class="max-w-6xl mx-auto">
+      <p class="text-[#60B5E8] font-semibold mb-3">
+        Comunicados institucionales
+      </p>
+
+      <h1 class="text-4xl md:text-5xl font-bold mb-6">
+        Noticias y comunicados
+      </h1>
+
+      <p class="text-slate-200 text-lg mb-8 max-w-3xl">
+        Mantente informado sobre actividades, avisos importantes, reuniones,
+        eventos académicos y comunicados de nuestra institución.
+      </p>
+
+      <div class="flex flex-wrap gap-3 mb-8">
+        <button
+          class="filtro-categoria bg-[#60B5E8] text-[#0B2344] px-5 py-2 rounded-xl font-semibold transition"
+          data-categoria="Todos"
+        >
+          Todos
+        </button>
+
+        <button
+          class="filtro-categoria bg-white/10 border border-white/10 hover:bg-white/15 px-5 py-2 rounded-xl font-semibold transition"
+          data-categoria="Comunicado"
+        >
+          Comunicados
+        </button>
+
+        <button
+          class="filtro-categoria bg-white/10 border border-white/10 hover:bg-white/15 px-5 py-2 rounded-xl font-semibold transition"
+          data-categoria="Actividad"
+        >
+          Actividades
+        </button>
+
+        <button
+          class="filtro-categoria bg-white/10 border border-white/10 hover:bg-white/15 px-5 py-2 rounded-xl font-semibold transition"
+          data-categoria="Aviso"
+        >
+          Avisos
+        </button>
+
+        <button
+          class="filtro-categoria bg-white/10 border border-white/10 hover:bg-white/15 px-5 py-2 rounded-xl font-semibold transition"
+          data-categoria="Evento"
+        >
+          Eventos
+        </button>
+      </div>
+
+      <div id="estado-noticias" class="text-slate-300 mb-6">
+        Cargando noticias...
+      </div>
+
+      <div
+        id="contenedor-noticias"
+        class="grid md:grid-cols-3 gap-6"
+      ></div>
+    </section>
+  </main>
+
+  <Footer />
+</Layout>
+
+<script>
+  import { collection, getDocs, orderBy, query } from "firebase/firestore";
+  import { db } from "../firebase/config.js";
+
+  const estadoNoticias = document.getElementById("estado-noticias");
+  const contenedorNoticias = document.getElementById("contenedor-noticias");
+  const botonesFiltro = document.querySelectorAll(".filtro-categoria");
+
+  let noticias = [];
+  let categoriaActual = "Todos";
+
+  const formatearFecha = (fechaFirebase) => {
+    if (!fechaFirebase) {
+      return "Fecha no disponible";
+    }
+
+    const fecha = fechaFirebase.toDate();
+
+    return fecha.toLocaleDateString("es-PE", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    });
+  };
+
+  const pintarBotonActivo = () => {
+    botonesFiltro.forEach((boton) => {
+      if (!(boton instanceof HTMLButtonElement)) return;
+
+      const categoria = boton.dataset.categoria;
+
+      if (categoria === categoriaActual) {
+        boton.className =
+          "filtro-categoria bg-[#60B5E8] text-[#0B2344] px-5 py-2 rounded-xl font-semibold transition";
+      } else {
+        boton.className =
+          "filtro-categoria bg-white/10 border border-white/10 hover:bg-white/15 px-5 py-2 rounded-xl font-semibold transition";
+      }
+    });
+  };
+
+  const mostrarNoticias = () => {
+    if (!(estadoNoticias instanceof HTMLDivElement)) return;
+    if (!(contenedorNoticias instanceof HTMLDivElement)) return;
+
+    const noticiasFiltradas =
+      categoriaActual === "Todos"
+        ? noticias
+        : noticias.filter((noticia) => noticia.categoria === categoriaActual);
+
+    contenedorNoticias.innerHTML = "";
+
+    if (noticiasFiltradas.length === 0) {
+      estadoNoticias.classList.remove("hidden");
+      estadoNoticias.textContent =
+        categoriaActual === "Todos"
+          ? "Todavía no hay publicaciones."
+          : `No hay publicaciones en la categoría ${categoriaActual}.`;
+      estadoNoticias.className = "text-slate-300 mb-6";
+      return;
+    }
+
+    estadoNoticias.classList.add("hidden");
+
+    noticiasFiltradas.forEach((noticia) => {
+      const tarjeta = document.createElement("article");
+
+      tarjeta.className =
+        "bg-white/10 border border-white/10 rounded-2xl p-6 hover:bg-white/15 transition";
+
+      tarjeta.innerHTML = `
+        ${
+          noticia.imagen
+            ? `<img
+                src="${noticia.imagen}"
+                alt="${noticia.titulo || "Noticia"}"
+                class="w-full h-48 object-cover rounded-xl mb-5"
+              />`
+            : ""
+        }
+
+        <p class="text-sm text-[#60B5E8] mb-2 font-semibold">
+          ${noticia.categoria || "Noticia"}
+        </p>
+
+        <h2 class="text-xl font-bold mb-3">
+          ${noticia.titulo || "Sin título"}
+        </h2>
+
+        <p class="text-slate-300 mb-5">
+          ${noticia.descripcion || "Sin descripción"}
+        </p>
+
+        <p class="text-xs text-slate-400">
+          Publicado: ${formatearFecha(noticia.fechaCreacion)}
+        </p>
+      `;
+
+      contenedorNoticias.appendChild(tarjeta);
+    });
+  };
+
+  const cargarNoticiasPublicas = async () => {
+    if (!(estadoNoticias instanceof HTMLDivElement)) return;
+
+    try {
+      const consulta = query(
+        collection(db, "noticias"),
+        orderBy("fechaCreacion", "desc")
+      );
+
+      const resultado = await getDocs(consulta);
+
+      noticias = resultado.docs.map((documento) => {
+        return {
+          id: documento.id,
+          ...documento.data(),
+        };
+      });
+
+      mostrarNoticias();
+    } catch (error) {
+      console.error(error);
+
+      estadoNoticias.textContent =
+        "No se pudieron cargar las publicaciones. Revisa la conexión o las reglas de Firestore.";
+
+      estadoNoticias.className = "text-red-300 mb-6";
+    }
+  };
+
+  botonesFiltro.forEach((boton) => {
+    boton.addEventListener("click", () => {
+      if (!(boton instanceof HTMLButtonElement)) return;
+
+      categoriaActual = boton.dataset.categoria || "Todos";
+
+      pintarBotonActivo();
+      mostrarNoticias();
+    });
+  });
+
+  cargarNoticiasPublicas();
+</script>
