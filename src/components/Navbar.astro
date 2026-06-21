@@ -1,32 +1,42 @@
 ---
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const currentPath = Astro.url.pathname;
 
+const cleanPath =
+  base && currentPath.startsWith(base)
+    ? currentPath.slice(base.length) || "/"
+    : currentPath;
+
 const links = [
-  { href: "/", label: "Inicio" },
-  { href: "/nosotros", label: "Nosotros" },
-  { href: "/noticias", label: "Noticias y comunicados" },
-  { href: "/galeria", label: "Galería" },
-  { href: "/contacto", label: "Contacto" },
-  { href: "/matricula", label: "Matrícula" },
+  { path: "/", label: "Inicio" },
+  { path: "/nosotros", label: "Nosotros" },
+  { path: "/noticias", label: "Noticias y comunicados" },
+  { path: "/galeria", label: "Galería" },
+  { path: "/contacto", label: "Contacto" },
+  { path: "/matricula", label: "Matrícula" },
 ];
 
-const isActive = (href: string) => {
-  if (href === "/") {
-    return currentPath === "/";
+const getHref = (path: string) => {
+  return `${base}${path === "/" ? "/" : path}`;
+};
+
+const isActive = (path: string) => {
+  if (path === "/") {
+    return cleanPath === "/" || cleanPath === "";
   }
 
-  return currentPath.startsWith(href);
+  return cleanPath.startsWith(path);
 };
 ---
 
 <header class="fixed top-0 left-0 w-full z-50 bg-[#0B2344]/90 backdrop-blur border-b border-white/10">
   <nav class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-    <a href="/" class="flex items-center gap-3">
+    <a href={getHref("/")} class="flex items-center gap-3">
       <div class="w-12 h-12 rounded-full bg-white p-1 flex items-center justify-center overflow-hidden">
         <img
-            src="/img/insigniaxammar.jpg"
-            alt="Insignia I.E. Luis Fabio Xammar"
-            class="w-full h-full object-contain"
+          src={`${base}/img/insigniaxammar.jpg`}
+          alt="Insignia I.E. Luis Fabio Xammar"
+          class="w-full h-full object-contain"
         />
       </div>
 
@@ -40,9 +50,9 @@ const isActive = (href: string) => {
       {
         links.map((link) => (
           <a
-            href={link.href}
+            href={getHref(link.path)}
             class={`transition ${
-              isActive(link.href)
+              isActive(link.path)
                 ? "text-[#60B5E8] font-semibold"
                 : "text-slate-300 hover:text-white"
             }`}
@@ -54,7 +64,7 @@ const isActive = (href: string) => {
     </div>
 
     <a
-      href="/login"
+      href={getHref("/login")}
       class={`hidden md:inline-block px-4 py-2 rounded-xl text-sm font-semibold transition ${
         isActive("/login")
           ? "bg-[#60B5E8] text-[#0B2344]"
@@ -81,9 +91,9 @@ const isActive = (href: string) => {
       {
         links.map((link) => (
           <a
-            href={link.href}
+            href={getHref(link.path)}
             class={`transition ${
-              isActive(link.href)
+              isActive(link.path)
                 ? "text-[#60B5E8] font-semibold"
                 : "text-slate-300 hover:text-white"
             }`}
@@ -94,7 +104,7 @@ const isActive = (href: string) => {
       }
 
       <a
-        href="/login"
+        href={getHref("/login")}
         class={`px-4 py-3 rounded-xl text-sm font-semibold text-center transition ${
           isActive("/login")
             ? "bg-[#60B5E8] text-[#0B2344]"
