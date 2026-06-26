@@ -3,6 +3,8 @@ import Layout from "../layouts/Layout.astro";
 import Navbar from "../components/Navbar.astro";
 import Hero from "../components/Hero.astro";
 import Footer from "../components/Footer.astro";
+const rawBase = import.meta.env.BASE_URL;
+const base = rawBase.endsWith("/") ? rawBase : `${rawBase}/`;
 ---
 
 <Layout title="Inicio | I.E. Luis Fabio Xammar">
@@ -29,7 +31,7 @@ import Footer from "../components/Footer.astro";
         </div>
 
         <a
-          href="/noticias"
+          href={`${base}noticias/`}
           class="bg-[#2F8FC9] hover:bg-[#60B5E8] text-white hover:text-[#0B2344] px-5 py-3 rounded-xl font-semibold transition text-center"
         >
           Ver todas
@@ -115,14 +117,14 @@ import Footer from "../components/Footer.astro";
 
       <div class="flex flex-col sm:flex-row gap-4 md:justify-end">
         <a
-          href="/matricula"
+          href={`${base}matricula/`}
           class="bg-[#2F8FC9] hover:bg-[#60B5E8] text-white hover:text-[#0B2344] px-6 py-3 rounded-xl font-semibold transition text-center"
         >
           Ver matrícula
         </a>
 
         <a
-          href="/contacto"
+          href={`${base}contacto/`}
           class="border border-[#0B2344]/20 hover:bg-slate-100 px-6 py-3 rounded-xl font-semibold transition text-center"
         >
           Contactar

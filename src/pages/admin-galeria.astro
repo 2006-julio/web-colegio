@@ -1,6 +1,21 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import Navbar from "../components/Navbar.astro";
+const rawBase = import.meta.env.BASE_URL;
+const base = rawBase.endsWith("/") ? rawBase : `${rawBase}/`;
+const currentPath = Astro.url.pathname.endsWith("/")
+  ? Astro.url.pathname
+  : `${Astro.url.pathname}/`;
+
+const normalButton =
+  "bg-white/10 border border-white/10 hover:bg-white/15 px-5 py-3 rounded-xl font-semibold transition text-center";
+
+const activeButton =
+  "bg-[#2F8FC9] border border-[#60B5E8] text-white shadow-lg shadow-[#2F8FC9]/20 px-5 py-3 rounded-xl font-semibold transition text-center";
+
+const getButtonClass = (href) => {
+  return currentPath === href ? activeButton : normalButton;
+};
 ---
 
 <Layout title="Admin Galería | I.E. Luis Fabio Xammar">
@@ -26,26 +41,40 @@ import Navbar from "../components/Navbar.astro";
             <p id="correo-admin" class="text-slate-300 mt-3"></p>
           </div>
 
-          <div class="flex flex-col sm:flex-row gap-3">
+          <div class="flex flex-col sm:flex-row flex-wrap gap-3">
             <a
-              href="/admin"
-              class="bg-white/10 border border-white/10 hover:bg-white/15 px-5 py-3 rounded-xl font-semibold transition text-center"
+              href={`${base}admin/`}
+              class={getButtonClass(`${base}admin/`)}
             >
               Panel
             </a>
 
             <a
-              href="/admin-noticias"
-              class="bg-white/10 border border-white/10 hover:bg-white/15 px-5 py-3 rounded-xl font-semibold transition text-center"
+              href={`${base}admin-noticias/`}
+              class={getButtonClass(`${base}admin-noticias/`)}
             >
               Noticias
             </a>
 
             <a
-              href="/admin-galeria"
-              class="bg-[#2F8FC9] hover:bg-[#60B5E8] text-white hover:text-[#0B2344] px-5 py-3 rounded-xl font-semibold transition text-center"
+              href={`${base}admin-galeria/`}
+              class={getButtonClass(`${base}admin-galeria/`)}
             >
               Galería
+            </a>
+
+            <a
+              href={`${base}admin-mensajes/`}
+              class={getButtonClass(`${base}admin-mensajes/`)}
+            >
+              Mensajes
+            </a>
+
+            <a
+              href={`${base}noticias/`}
+              class={getButtonClass(`${base}noticias/`)}
+            >
+              Ver publicaciones
             </a>
 
             <button
@@ -160,6 +189,8 @@ import Navbar from "../components/Navbar.astro";
   } from "firebase/firestore";
   import { auth, db } from "../firebase/config.js";
 
+  const rawBase = import.meta.env.BASE_URL;
+  const base = rawBase.endsWith("/") ? rawBase : `${rawBase}/`;
   const cargando = document.getElementById("cargando");
   const contenidoAdmin = document.getElementById("contenido-admin");
   const correoAdmin = document.getElementById("correo-admin");
@@ -412,7 +443,7 @@ import Navbar from "../components/Navbar.astro";
 
   onAuthStateChanged(auth, async (user) => {
     if (!user) {
-      window.location.href = "/login";
+      window.location.href = `${base}login/`;
       return;
     }
 
@@ -435,7 +466,7 @@ import Navbar from "../components/Navbar.astro";
     btnLogout.addEventListener("click", async () => {
       try {
         await signOut(auth);
-        window.location.href = "/login";
+        window.location.href = `${base}login/`;
       } catch (error) {
         console.error(error);
         alert("No se pudo cerrar sesión.");

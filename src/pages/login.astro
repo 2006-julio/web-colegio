@@ -1,6 +1,8 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import Navbar from "../components/Navbar.astro";
+const rawBase = import.meta.env.BASE_URL;
+const base = rawBase.endsWith("/") ? rawBase : `${rawBase}/`;
 ---
 
 <Layout title="Login | I.E. Luis Fabio Xammar">
@@ -10,7 +12,7 @@ import Navbar from "../components/Navbar.astro";
     <section class="w-full max-w-md bg-white/10 border border-white/10 rounded-3xl p-8 shadow-2xl">
       <div class="flex justify-center mb-6">
         <img
-          src="/img/insigniaxammar.jpg"
+          src={`${base}img/insigniaxammar.jpg`}
           alt="Insignia I.E. Luis Fabio Xammar"
           class="w-20 h-20 rounded-full object-cover bg-white p-2"
         />
@@ -56,9 +58,12 @@ import Navbar from "../components/Navbar.astro";
 </Layout>
 
 <script>
+
   import { signInWithEmailAndPassword } from "firebase/auth";
   import { auth } from "../firebase/config";
 
+  const rawBase = import.meta.env.BASE_URL;
+  const base = rawBase.endsWith("/") ? rawBase : `${rawBase}/`;
   const formLogin = document.getElementById("form-login");
   const emailInput = document.getElementById("email");
   const passwordInput = document.getElementById("password");
@@ -95,7 +100,7 @@ import Navbar from "../components/Navbar.astro";
         mensajeLogin.textContent = "Inicio de sesión correcto.";
         mensajeLogin.className = "text-center text-sm mt-4 text-green-300";
 
-        window.location.href = "/admin";
+        window.location.href = `${base}admin/`;
       } catch (error) {
         console.error(error);
 

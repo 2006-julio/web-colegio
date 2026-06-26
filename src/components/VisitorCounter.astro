@@ -1,0 +1,97 @@
+<div class="mt-4 flex items-center justify-center gap-2 text-sm text-slate-400">
+  <span>👁️ Eres el visitante N°:</span>
+  <span id="contador-visitas" class="font-bold text-[#60B5E8]">
+    Cargando...
+  </span>
+</div>
+
+<script>
+  import { doc, getDoc, runTransaction } from "firebase/firestore";
+  import { db } from "../firebase/config.js";
+
+  const contadorVisitas = document.getElementById("contador-visitas");
+
+  const claveVisita = "lfx_visita_contada_v1";
+  const referenciaContador = doc(db, "estadisticas", "visitas");
+
+  const formatearNumero = (numero) => {
+    return new Intl.NumberFormat("es-PE").format(numero);
+  };
+
+  const obtenerMarcaLocal = () => {
+    try {
+      return localStorage.getItem(claveVisita);
+    } catch (error) {
+      return null;
+    }
+  };
+
+  const guardarMarcaLocal = () => {
+    try {
+      localStorage.setItem(claveVisita, "si");
+    } catch (error) {
+      console.warn("No se pudo guardar la marca local de visita.");
+    }
+  };
+
+  const mostrarTotalActual = async () => {
+    if (!(contadorVisitas instanceof HTMLSpanElement)) return;
+
+    const documento = await getDoc(referenciaContador);
+
+    if (!documento.exists()) {
+      contadorVisitas.textContent = "0";
+      return;
+    }
+
+    const datos = documento.data();
+    const total = Number(datos.total || 0);
+
+    contadorVisitas.textContent = formatearNumero(total);
+  };
+
+  const registrarVisita = async () => {
+    if (!(contadorVisitas instanceof HTMLSpanElement)) return;
+
+    const visitaYaContada = obtenerMarcaLocal();
+
+    if (visitaYaContada === "si") {
+      await mostrarTotalActual();
+      return;
+    }
+
+    const nuevoTotal = await runTransaction(db, async (transaccion) => {
+      const documento = await transaccion.get(referenciaContador);
+
+      if (!documento.exists()) {
+        transaccion.set(referenciaContador, {
+          total: 1,
+        });
+
+        return 1;
+      }
+
+      const datos = documento.data();
+      const totalActual = Number(datos.total || 0);
+      const totalNuevo = totalActual + 1;
+
+      transaccion.update(referenciaContador, {
+        total: totalNuevo,
+      });
+
+      return totalNuevo;
+    });
+
+    guardarMarcaLocal();
+
+    contadorVisitas.textContent = formatearNumero(nuevoTotal);
+  };
+
+  registrarVisita().catch((error) => {
+    console.error(error);
+
+    if (contadorVisitas instanceof HTMLSpanElement) {
+      contadorVisitas.textContent = "No disponible";
+    }
+  });
+</script>

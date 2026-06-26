@@ -1,84 +1,127 @@
-<footer class="bg-[#071A33] border-t border-white/10">
-  <div class="max-w-6xl mx-auto px-6 py-12">
-    <div class="grid md:grid-cols-4 gap-10">
-      <!-- Identidad -->
-      <div class="md:col-span-1">
-        <div class="flex items-center gap-3 mb-4">
-          <div class="w-12 h-12 rounded-full bg-white p-1 flex items-center justify-center overflow-hidden">
+---
+import VisitorCounter from "./VisitorCounter.astro";
+
+const rawBase = import.meta.env.BASE_URL;
+const base = rawBase.endsWith("/") ? rawBase : `${rawBase}/`;
+---
+
+<footer class="bg-[#081C36] border-t border-white/10 px-6 py-12">
+  <div class="max-w-7xl mx-auto">
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-10">
+      <div>
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-14 h-14 rounded-full bg-white p-1 flex items-center justify-center overflow-hidden">
             <img
-              src="/img/insigniaxammar.jpg"
+              src={`${base}img/insigniaxammar.jpg`}
               alt="Insignia I.E. Luis Fabio Xammar"
               class="w-full h-full object-contain"
             />
           </div>
 
-          <div class="leading-tight">
-            <p class="text-sm font-bold text-white">I.E. Luis Fabio</p>
-            <p class="text-xs font-semibold text-[#60B5E8]">Xammar</p>
+          <div>
+            <h3 class="font-bold text-white leading-tight">
+              I.E. Luis Fabio
+            </h3>
+
+            <p class="text-[#60B5E8] text-sm font-semibold">
+              Xammar
+            </p>
           </div>
         </div>
 
-        <p class="text-slate-300 text-sm leading-relaxed">
+        <p class="text-slate-300 leading-relaxed text-sm">
           Institución educativa comprometida con la formación académica, los
           valores, la disciplina y la identidad xammarina.
         </p>
       </div>
 
-      <!-- Enlaces -->
       <div>
-        <h3 class="text-white font-bold mb-4">
+        <h3 class="text-white font-bold mb-5">
           Navegación
         </h3>
 
-        <div class="flex flex-col gap-3 text-sm text-slate-300">
-          <a href="/" class="hover:text-[#60B5E8] transition">Inicio</a>
-          <a href="/nosotros" class="hover:text-[#60B5E8] transition">Nosotros</a>
-          <a href="/noticias" class="hover:text-[#60B5E8] transition">Noticias</a>
-          <a href="/galeria" class="hover:text-[#60B5E8] transition">Galería</a>
-          <a href="/matricula" class="hover:text-[#60B5E8] transition">Matrícula</a>
-          <a href="/contacto" class="hover:text-[#60B5E8] transition">Contacto</a>
-          <a href="/privacidad" class="hover:text-[#60B5E8] transition">Privacidad</a>
+        <div class="flex flex-col gap-3 text-sm">
+          <a href={base} class="text-slate-300 hover:text-[#60B5E8] transition">
+            Inicio
+          </a>
+
+          <a href={`${base}nosotros/`} class="text-slate-300 hover:text-[#60B5E8] transition">
+            Nosotros
+          </a>
+
+          <a href={`${base}noticias/`} class="text-slate-300 hover:text-[#60B5E8] transition">
+            Noticias y comunicados
+          </a>
+
+          <a href={`${base}galeria/`} class="text-slate-300 hover:text-[#60B5E8] transition">
+            Galería
+          </a>
+
+          <a href={`${base}matricula/`} class="text-slate-300 hover:text-[#60B5E8] transition">
+            Matrícula
+          </a>
+
+          <a href={`${base}contacto/`} class="text-slate-300 hover:text-[#60B5E8] transition">
+            Contacto
+          </a>
+
+          <a href={`${base}privacidad/`} class="text-slate-300 hover:text-[#60B5E8] transition">
+            Privacidad
+          </a>
         </div>
       </div>
 
-      <!-- Información -->
       <div>
-        <h3 class="text-white font-bold mb-4">
+        <h3 class="text-white font-bold mb-5">
           Información
         </h3>
 
-        <div class="flex flex-col gap-3 text-sm text-slate-300">
-          <p>📍 Huacho, Perú</p>
-          <p>☎️ 982 511 250</p>
-          <p>✉️ colegio@ejemplo.com</p>
-          <p>🕘 Lunes a viernes</p>
+        <div class="flex flex-col gap-4 text-sm text-slate-300">
+          <p class="flex items-start gap-2">
+            <span>📍</span>
+            <span>Huacho, Perú</span>
+          </p>
+
+          <p class="flex items-start gap-2">
+            <span>☎️</span>
+            <span>982 511 250</span>
+          </p>
+
+          <p class="flex items-start gap-2">
+            <span>✉️</span>
+            <span>colegio@ejemplo.com</span>
+          </p>
+
+          <p class="flex items-start gap-2">
+            <span>🕘</span>
+            <span>Lunes a viernes</span>
+          </p>
         </div>
       </div>
 
-      <!-- Accesos -->
       <div>
-        <h3 class="text-white font-bold mb-4">
+        <h3 class="text-white font-bold mb-5">
           Accesos rápidos
         </h3>
 
         <div class="flex flex-col gap-3">
           <a
-            href="/noticias"
-            class="bg-white/10 border border-white/10 hover:bg-white/15 px-4 py-3 rounded-xl text-sm font-semibold transition text-center"
+            href={`${base}noticias/`}
+            class="bg-white/10 border border-white/10 hover:bg-white/15 px-5 py-3 rounded-xl font-semibold text-center transition"
           >
             Ver comunicados
           </a>
 
           <a
-            href="/matricula"
-            class="bg-[#2F8FC9] hover:bg-[#60B5E8] text-white hover:text-[#0B2344] px-4 py-3 rounded-xl text-sm font-semibold transition text-center"
+            href={`${base}matricula/`}
+            class="bg-[#2F8FC9] hover:bg-[#60B5E8] text-white hover:text-[#0B2344] px-5 py-3 rounded-xl font-semibold text-center transition"
           >
             Información de matrícula
           </a>
 
           <a
-            href="/login"
-            class="border border-white/20 hover:bg-white/10 px-4 py-3 rounded-xl text-sm font-semibold transition text-center"
+            href={`${base}login/`}
+            class="border border-white/20 hover:border-[#60B5E8] hover:text-[#60B5E8] px-5 py-3 rounded-xl font-semibold text-center transition"
           >
             Acceso administrador
           </a>
@@ -94,5 +137,8 @@
       <p class="mt-2">
         Página web institucional.
       </p>
+
+      <VisitorCounter />
     </div>
+  </div>
 </footer>

@@ -2,6 +2,8 @@
 import Layout from "../layouts/Layout.astro";
 import Navbar from "../components/Navbar.astro";
 import Footer from "../components/Footer.astro";
+const rawBase = import.meta.env.BASE_URL;
+const base = rawBase.endsWith("/") ? rawBase : `${rawBase}/`;
 ---
 
 <Layout title="Matrícula | I.E. Luis Fabio Xammar">
@@ -28,14 +30,14 @@ import Footer from "../components/Footer.astro";
 
           <div class="flex flex-col sm:flex-row gap-4">
             <a
-              href="/contacto"
+              href={`${base}contacto/`}
               class="bg-[#2F8FC9] hover:bg-[#60B5E8] text-white hover:text-[#0B2344] px-6 py-3 rounded-xl font-semibold transition text-center"
             >
               Consultar matrícula
             </a>
 
             <a
-              href="/noticias"
+              href={`${base}noticias/`}
               class="border border-white/30 hover:bg-white/10 px-6 py-3 rounded-xl font-semibold transition text-center"
             >
               Ver comunicados
@@ -194,7 +196,7 @@ import Footer from "../components/Footer.astro";
           </div>
 
           <a
-            href="/contacto"
+            href={`${base}contacto/`}
             class="inline-block bg-[#2F8FC9] hover:bg-[#60B5E8] text-white hover:text-[#0B2344] px-6 py-3 rounded-xl font-semibold transition"
           >
             Solicitar información
@@ -282,14 +284,14 @@ import Footer from "../components/Footer.astro";
 
         <div class="flex flex-col sm:flex-row gap-4 md:justify-end">
           <a
-            href="/contacto"
+            href={`${base}contacto/`}
             class="bg-[#2F8FC9] hover:bg-[#60B5E8] text-white hover:text-[#0B2344] px-6 py-3 rounded-xl font-semibold transition text-center"
           >
             Ir a contacto
           </a>
 
           <a
-            href="/noticias"
+            href={`${base}noticias/`}
             class="border border-[#0B2344]/20 hover:bg-slate-100 px-6 py-3 rounded-xl font-semibold transition text-center"
           >
             Ver comunicados

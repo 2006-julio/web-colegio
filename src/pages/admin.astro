@@ -1,6 +1,21 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import Navbar from "../components/Navbar.astro";
+const rawBase = import.meta.env.BASE_URL;
+const base = rawBase.endsWith("/") ? rawBase : `${rawBase}/`;
+const currentPath = Astro.url.pathname.endsWith("/")
+  ? Astro.url.pathname
+  : `${Astro.url.pathname}/`;
+
+const normalButton =
+  "bg-white/10 border border-white/10 hover:bg-white/15 px-5 py-3 rounded-xl font-semibold transition text-center";
+
+const activeButton =
+  "bg-[#2F8FC9] border border-[#60B5E8] text-white shadow-lg shadow-[#2F8FC9]/20 px-5 py-3 rounded-xl font-semibold transition text-center";
+
+const getButtonClass = (href) => {
+  return currentPath === href ? activeButton : normalButton;
+};
 ---
 
 <Layout title="Panel Admin | I.E. Luis Fabio Xammar">
@@ -36,7 +51,7 @@ import Navbar from "../components/Navbar.astro";
 
         <div class="grid md:grid-cols-3 gap-6">
           <a
-            href="/admin-noticias"
+            href={`${base}admin-noticias/`}
             class="group bg-white/10 border border-white/10 rounded-3xl p-6 hover:bg-white/15 transition"
           >
             <div class="w-14 h-14 rounded-2xl bg-[#2F8FC9] flex items-center justify-center text-2xl mb-5">
@@ -53,7 +68,7 @@ import Navbar from "../components/Navbar.astro";
           </a>
 
           <a
-            href="/admin-galeria"
+            href={`${base}admin-galeria/`}
             class="group bg-white/10 border border-white/10 rounded-3xl p-6 hover:bg-white/15 transition"
           >
             <div class="w-14 h-14 rounded-2xl bg-[#2F8FC9] flex items-center justify-center text-2xl mb-5">
@@ -70,7 +85,7 @@ import Navbar from "../components/Navbar.astro";
           </a>
 
           <a
-            href="/noticias"
+            href={`${base}noticias/`}
             class="group bg-white/10 border border-white/10 rounded-3xl p-6 hover:bg-white/15 transition"
             >
             <div class="w-14 h-14 rounded-2xl bg-[#2F8FC9] flex items-center justify-center text-2xl mb-5">
@@ -86,7 +101,7 @@ import Navbar from "../components/Navbar.astro";
             </p>
             </a>
             <a
-              href="/admin-mensajes"
+              href={`${base}admin-mensajes/`}
               class="group bg-white/10 border border-white/10 rounded-3xl p-6 hover:bg-white/15 transition"
             >
               <div class="w-14 h-14 rounded-2xl bg-[#2F8FC9] flex items-center justify-center text-2xl mb-5">
@@ -111,6 +126,8 @@ import Navbar from "../components/Navbar.astro";
   import { onAuthStateChanged, signOut } from "firebase/auth";
   import { auth } from "../firebase/config.js";
 
+  const rawBase = import.meta.env.BASE_URL;
+  const base = rawBase.endsWith("/") ? rawBase : `${rawBase}/`;
   const cargando = document.getElementById("cargando");
   const contenidoAdmin = document.getElementById("contenido-admin");
   const correoAdmin = document.getElementById("correo-admin");
@@ -118,7 +135,7 @@ import Navbar from "../components/Navbar.astro";
 
   onAuthStateChanged(auth, (user) => {
     if (!user) {
-      window.location.href = "/login";
+      window.location.href = `${base}login/`;
       return;
     }
 
@@ -139,7 +156,7 @@ import Navbar from "../components/Navbar.astro";
     btnLogout.addEventListener("click", async () => {
       try {
         await signOut(auth);
-        window.location.href = "/login";
+        window.location.href = `${base}login/`;
       } catch (error) {
         console.error(error);
         alert("No se pudo cerrar sesión.");
